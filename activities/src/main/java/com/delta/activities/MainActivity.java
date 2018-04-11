@@ -1,9 +1,19 @@
 package com.delta.activities;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
@@ -21,30 +31,36 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends Activity {
 
-    // User Session Manager Class
     UserSessionManager session;
-
-    // Button Logout
     Button btnLogout;
+    Button btnDashboard;
     ProgressDialog pDialog;
+
+    Tag detectedTag;
+    TextView tagContent;
+    NfcAdapter nfcAdapter;
+    IntentFilter[] readTagFilters;
+    PendingIntent pendingIntent;
+
+    private static int readCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Session class instance
         session = new UserSessionManager(getApplicationContext());
 
-        // Button logout
-        btnLogout = (Button) findViewById(R.id.btnLogout);
-
-        if(session.checkLogin()) {
+        if (session.checkLogin()) {
             finish();
         }
 
@@ -70,6 +86,7 @@ public class MainActivity extends Activity {
         lastName.setText(Html.fromHtml("Last name: <b>" + ln + "</b>"));
         email.setText(Html.fromHtml("Email: <b>" + em + "</b>"));
 
+        btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -77,9 +94,67 @@ public class MainActivity extends Activity {
                 session.logoutUser();
             }
         });
+
+        btnDashboard = findViewById(R.id.btnDashboard);
+        btnDashboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
+                startActivity(i);
+            }
+        });
+
+        tagContent = findViewById(R.id.lblTagContent);
     }
 
-    public void requestNewToken (UserSessionManager session, final String fn, final String ln, final String em) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMessages != null) {
+                NdefMessage[] messages = new NdefMessage[rawMessages.length];
+                for (int i = 0; i < rawMessages.length; i++) {
+                    messages[i] = (NdefMessage) rawMessages[i];
+                }
+                NdefMessage msg = messages[0];
+
+                try {
+                    String content = new String(msg.getRecords()[0].getPayload(), "UTF-8");
+                    tagContent.setText(content + readCount);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        readCount++;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null) {
+            System.out.println("not supported");
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                    getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        }
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(nfcAdapter!= null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
+    }
+
+    public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
 
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
 

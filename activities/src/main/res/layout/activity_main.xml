@@ -34,11 +34,32 @@
             android:layout_marginBottom="40dip"
             android:singleLine="false" />
 
+        <TextView
+            android:id="@+id/lblTagText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dip"
+            android:singleLine="false"
+            android:text="Tag content:"/>
+
+        <TextView
+            android:id="@+id/lblTagContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dip"
+            android:singleLine="false"/>
+
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/logout" />
+
+        <Button
+            android:id="@+id/btnDashboard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard" />
 
     </LinearLayout>
 </ScrollView>

@@ -13,4 +13,6 @@
     <string name="lastName">Last Name</string>
     <string name="email">Email</string>
     <string name="logout">Logout</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="transition_string">Transition test</string>
 </resources>
