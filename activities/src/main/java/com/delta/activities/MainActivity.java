@@ -5,16 +5,12 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
@@ -34,19 +30,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends Activity {
 
     UserSessionManager session;
-    Button btnLogout;
+    CardView btnLogout;
     Button btnDashboard;
     ProgressDialog pDialog;
 
@@ -71,9 +63,9 @@ public class MainActivity extends Activity {
             finish();
         }
 
-        TextView firstName = findViewById(R.id.lblFirstName);
-        TextView lastName = findViewById(R.id.lblLastName);
-        TextView email = findViewById(R.id.lblEmail);
+//        TextView firstName = findViewById(R.id.lblFirstName);
+//        TextView lastName = findViewById(R.id.lblLastName);
+//        TextView email = findViewById(R.id.lblEmail);
 
         HashMap<String, String> user = session.getUserDetails();
 
@@ -89,9 +81,9 @@ public class MainActivity extends Activity {
             requestNewToken(session, fn, ln, em);
         }
 
-        firstName.setText(Html.fromHtml("First name: <b>" + fn + "</b>"));
-        lastName.setText(Html.fromHtml("Last name: <b>" + ln + "</b>"));
-        email.setText(Html.fromHtml("Email: <b>" + em + "</b>"));
+//        firstName.setText(Html.fromHtml("First name: <b>" + fn + "</b>"));
+//        lastName.setText(Html.fromHtml("Last name: <b>" + ln + "</b>"));
+//        email.setText(Html.fromHtml("Email: <b>" + em + "</b>"));
 
         btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +94,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        btnDashboard = findViewById(R.id.btnDashboard);
+        /*btnDashboard = findViewById(R.id.btnDashboard);
         btnDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,9 +102,9 @@ public class MainActivity extends Activity {
                 i.putParcelableArrayListExtra("galleries", galleryList);
                 startActivity(i);
             }
-        });
+        });*/
 
-        tagContent = findViewById(R.id.lblTagContent);
+        // tagContent = findViewById(R.id.lblTagContent);
 
         galleryList = new ArrayList<>();
 

@@ -14,10 +14,19 @@
     <string name="lastName">Last Name</string>
     <string name="email">Email</string>
     <string name="logout">Logout</string>
+    <string name="logout_desc">Enough for me</string>
     <string name="dashboard">Dashboard</string>
     <string name="transition_string">Transition test</string>
     <string name="write_review">Write Review</string>
     <string name="backdrop_title">LOVE MUSIC</string>
     <string name="backdrop_subtitle">This season top 20 albums</string>
     <string name="login_text">LOGIN</string>
+    <string name="galleries">Galleries</string>
+    <string name="galleries_desc">I want to explore</string>
+    <string name="poi">Points of interest</string>
+    <string name="map">Museum map</string>
+    <string name="position">Where am I?</string>
+    <string name="poi_desc">I\'m hungry</string>
+    <string name="settings">Settings</string>
+    <string name="settings_desc">I\'ll do it myself</string>
 </resources>
