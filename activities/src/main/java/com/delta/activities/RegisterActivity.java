@@ -42,7 +42,7 @@ public class RegisterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        loginLink = findViewById(R.id.loginLink);
+        loginLink = findViewById(R.id.register_screen_btn_login);
         loginLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,7 +51,7 @@ public class RegisterActivity extends Activity {
             }
         });
 
-        btnRegister = findViewById(R.id.btnRegister);
+        btnRegister = findViewById(R.id.register_screen_btn_register);
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,11 +130,11 @@ public class RegisterActivity extends Activity {
     }
 
     private JSONObject getUserData() {
-        String firstName = ((EditText) findViewById(R.id.firstName)).getText().toString();
-        String lastName = ((EditText) findViewById(R.id.lastName)).getText().toString();
-        String email = ((EditText) findViewById(R.id.email)).getText().toString();
-        String username = ((EditText) findViewById(R.id.registerUsername)).getText().toString();
-        String password = ((EditText) findViewById(R.id.registerPassword)).getText().toString();
+        String firstName = ((EditText) findViewById(R.id.firstNameInput)).getText().toString();
+        String lastName = ((EditText) findViewById(R.id.lastNameInput)).getText().toString();
+        String email = ((EditText) findViewById(R.id.emailInput)).getText().toString();
+        String username = ((EditText) findViewById(R.id.usernameInput)).getText().toString();
+        String password = ((EditText) findViewById(R.id.passwordInput)).getText().toString();
 
         final JSONObject user = new JSONObject();
 

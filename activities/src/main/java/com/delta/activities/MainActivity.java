@@ -252,7 +252,6 @@ public class MainActivity extends Activity {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        System.out.println(response.toString());
                         parseResponse(response);
                     }
                 },

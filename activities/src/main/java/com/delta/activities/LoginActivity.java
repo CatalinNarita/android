@@ -5,11 +5,18 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.ClientError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -35,6 +42,10 @@ public class LoginActivity extends Activity {
     TextView registerLink;
     ProgressDialog pDialog;
 
+    ProgressBar progressBar;
+    AlphaAnimation inAnimation;
+    AlphaAnimation outAnimation;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,10 +53,13 @@ public class LoginActivity extends Activity {
 
         session = new UserSessionManager(getApplicationContext());
 
-        username = findViewById(R.id.username);
-        password = findViewById(R.id.password);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
 
-        btnLogin = findViewById(R.id.btnLogin);
+        username = findViewById(R.id.usernameInput);
+        password = findViewById(R.id.passwordInput);
+
+        btnLogin = findViewById(R.id.login_screen_btn_login);
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -54,7 +68,7 @@ public class LoginActivity extends Activity {
             }
         });
 
-        registerLink = findViewById(R.id.registerLink);
+        registerLink = findViewById(R.id.login_screen_btn_register);
         registerLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,8 +79,8 @@ public class LoginActivity extends Activity {
     }
 
     public void requestAccessToken(final View view) {
-        final String username = ((EditText) findViewById(R.id.username)).getText().toString();
-        final String password = ((EditText) findViewById(R.id.password)).getText().toString();
+        final String username = ((EditText) findViewById(R.id.usernameInput)).getText().toString();
+        final String password = ((EditText) findViewById(R.id.passwordInput)).getText().toString();
 
         String URL = String.format(Constants.REQUEST_TOKEN_URL, username, password);
 
@@ -77,9 +91,17 @@ public class LoginActivity extends Activity {
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Logging in...");
+        pDialog.setTitle("Trying to log in..");
+        pDialog.setMessage("Please wat...");
         pDialog.setCancelable(false);
         pDialog.show();
+
+//        inAnimation = new AlphaAnimation(0f, 1f);
+//        inAnimation.setDuration(200);
+//        progressBar.setAnimation(inAnimation);
+//        progressBar.setVisibility(View.VISIBLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+//                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
@@ -98,7 +120,20 @@ public class LoginActivity extends Activity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
+
+                        if (error instanceof NoConnectionError) {
+                            Toast.makeText(getApplicationContext(), "You are not connected to the internet!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if(error.networkResponse != null) {
+                                int statusCode = error.networkResponse.statusCode;
+                                if (statusCode == 400) {
+                                    Toast.makeText(getApplicationContext(), "Wrong username of password!", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Could not connect. Please try again later", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+
                         pDialog.hide();
                     }
                 }
@@ -133,6 +168,11 @@ public class LoginActivity extends Activity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        /*outAnimation = new AlphaAnimation(1f, 0f);
+                        outAnimation.setDuration(200);
+                        progressBar.setAnimation(outAnimation);
+                        progressBar.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/
                         pDialog.hide();
                     }
                 },
