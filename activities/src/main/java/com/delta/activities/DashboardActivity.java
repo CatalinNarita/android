@@ -1,19 +1,22 @@
 package com.delta.activities;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.res.Resources;
-import android.graphics.Rect;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Parcelable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -33,143 +36,267 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by naritc on 11-Apr-18.
- */
-
-public class DashboardActivity extends AppCompatActivity {
-    CardView mycard ;
-    LinearLayout ll;
-
-    ProgressDialog pDialog;
+public class DashboardActivity extends Activity {
 
     UserSessionManager session;
+    CardView btnLogout;
+    Button btnDashboard;
+    ProgressDialog pDialog;
 
-    private RecyclerView recyclerView;
-    private GalleriesAdapter adapter;
+    Tag detectedTag;
+    TextView tagContent;
+    NfcAdapter nfcAdapter;
+    IntentFilter[] readTagFilters;
+    PendingIntent pendingIntent;
+
+    CardView galleries;
+
+    private ArrayList<Gallery> galleryList;
+
+    private static int readCount = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_dashboard);
-
-        initCollapsingToolbar();
+        setContentView(R.layout.activity_dashboard);
 
         session = new UserSessionManager(getApplicationContext());
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        if (session.checkLogin()) {
+            finish();
+        }
 
-        Bundle b = this.getIntent().getExtras();
+        HashMap<String, String> user = session.getUserDetails();
 
-        ArrayList<Gallery> galleryList = b.getParcelableArrayList("galleries");
+        String fn = user.get(UserSessionManager.KEY_FIRST_NAME);
+        String ln = user.get(UserSessionManager.KEY_LAST_NAME);
+        String em = user.get(UserSessionManager.KEY_EMAIL);
 
-        adapter = new GalleriesAdapter(this, galleryList);
+        if (session.hasTokenExpired()) {
+            pDialog = new ProgressDialog(this);
+            pDialog.setMessage("Loading...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+            requestNewToken(session, fn, ln, em);
+        }
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-
-        adapter.notifyDataSetChanged();
-
-    }
-
-    private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(" ");
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
-
-        // hiding & showing the title when toolbar expanded & collapsed
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
+        btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
-                    isShow = true;
-                } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
-                    isShow = false;
-                }
+            public void onClick(View arg0) {
+                session.logoutUser();
             }
         });
+
+
+        galleries = findViewById(R.id.galleriesId);
+        galleries.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), GalleriesActivity.class);
+                i.putParcelableArrayListExtra("galleries", galleryList);
+                startActivity(i);
+            }
+        });
+
+        // tagContent = findViewById(R.id.lblTagContent);
+
+        galleryList = new ArrayList<>();
+
+        prepareGalleries();
+
     }
 
-    /*public void animateIntent(View view) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
-        // Ordinary Intent for launching a new activity
-        Intent intent = new Intent(this, ActivityFromTransition.class);
-
-        // Get the transition name from the string
-        String transitionName = getString(R.string.transition_string);
-
-        // Define the view that the animation will start from
-        View viewStart = findViewById(R.id.bankcardId);
-
-        ActivityOptionsCompat options =
-
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                        viewStart,   // Starting view
-                        transitionName    // The String
-                );
-        //Start the Intent
-        ActivityCompat.startActivity(this, intent, options.toBundle());
-
-    }*/
-
-    /**
-     * RecyclerView item decoration - give equal margin around grid item
-     */
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
+        if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMessages != null) {
+                NdefMessage[] messages = new NdefMessage[rawMessages.length];
+                for (int i = 0; i < rawMessages.length; i++) {
+                    messages[i] = (NdefMessage) rawMessages[i];
                 }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
+                NdefMessage msg = messages[0];
+
+                try {
+                    String content = new String(msg.getRecords()[0].getPayload(), "UTF-8");
+                    tagContent.setText(content + readCount);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
+        readCount++;
     }
 
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    @Override
+    protected void onResume() {
+        super.onResume();
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter == null) {
+            System.out.println("not supported");
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                    getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        }
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(nfcAdapter!= null) {
+            nfcAdapter.disableForegroundDispatch(this);
+        }
+    }
+
+    public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
+
+        String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
+
+        final Map<String, String> headers = new HashMap<String, String>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Basic " + Constants.CLIENT_CREDENTIALS_ENCODED);
+
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                URL,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        handleResponse(response, fn, ln, em);
+                        pDialog.hide();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        pDialog.hide();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void handleResponse(JSONObject response, String fn, String ln, String em) {
+
+        String accessToken;
+        String refreshToken;
+        Long expiresIn;
+
+        try {
+
+            accessToken = response.get("access_token").toString();
+            refreshToken = response.get("refresh_token").toString();
+            expiresIn = Long.parseLong(response.get("expires_in").toString());
+
+            session.createUserLoginSession(fn, ln, em, accessToken, refreshToken, expiresIn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Starting DashboardActivity
+        Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // Add new Flag to start new Activity
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+
+        Toast.makeText(getApplicationContext(), "Refreshed logged in user token", Toast.LENGTH_LONG).show();
+    }
+
+    private void prepareGalleries() {
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        String URL = Constants.GET_ALL_GALLERIES_URL;
+
+        final Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Bearer " + session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Logging in...");
+        pDialog.setCancelable(false);
+
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                URL,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        parseResponse(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void parseResponse(JSONArray response) {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                jsonObjects.add(response.getJSONObject(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        int[] covers = new int[]{
+                R.drawable.history,
+                R.drawable.science,
+                R.drawable.nature};
+
+        for(JSONObject o : jsonObjects) {
+            try {
+                int image = 0;
+                String category = o.get("category").toString();
+
+                switch (category) {
+                    case "HISTORY":
+                        image = 0;
+                        break;
+                    case "SCIENCE":
+                        image = 1;
+                        break;
+                    case "NATURE":
+                        image = 2;
+                        break;
+                    default:
+                        break;
+                }
+
+                Gallery gallery = new Gallery(o.get("name").toString(), o.get("description").toString(), covers[image]);
+                galleryList.add(gallery);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

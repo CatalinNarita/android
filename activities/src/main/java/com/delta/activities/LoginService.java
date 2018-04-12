@@ -29,7 +29,7 @@ public class LoginService {
             e.printStackTrace();
         }
 
-        Intent i = new Intent(context, MainActivity.class);
+        Intent i = new Intent(context, DashboardActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // Add new Flag to start new Activity
@@ -41,7 +41,7 @@ public class LoginService {
 
         session.createUserLoginSession(fn, ln ,em, accessToken, refreshToken, expiresIn);
 
-        Intent i = new Intent(context, MainActivity.class);
+        Intent i = new Intent(context, DashboardActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // Add new Flag to start new Activity
