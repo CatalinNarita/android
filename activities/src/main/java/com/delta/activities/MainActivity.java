@@ -14,6 +14,7 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
@@ -25,16 +26,20 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -50,6 +55,8 @@ public class MainActivity extends Activity {
     NfcAdapter nfcAdapter;
     IntentFilter[] readTagFilters;
     PendingIntent pendingIntent;
+
+    private ArrayList<Gallery> galleryList;
 
     private static int readCount = 0;
 
@@ -100,11 +107,17 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
+                i.putParcelableArrayListExtra("galleries", galleryList);
                 startActivity(i);
             }
         });
 
         tagContent = findViewById(R.id.lblTagContent);
+
+        galleryList = new ArrayList<>();
+
+        prepareGalleries();
+
     }
 
     @Override
@@ -217,6 +230,87 @@ public class MainActivity extends Activity {
         startActivity(i);
 
         Toast.makeText(getApplicationContext(), "Refreshed logged in user token", Toast.LENGTH_LONG).show();
+    }
+
+    private void prepareGalleries() {
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        String URL = Constants.GET_ALL_GALLERIES_URL;
+
+        final Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Bearer " + session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Logging in...");
+        pDialog.setCancelable(false);
+
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
+                Request.Method.GET,
+                URL,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        System.out.println(response.toString());
+                        parseResponse(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void parseResponse(JSONArray response) {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                jsonObjects.add(response.getJSONObject(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        int[] covers = new int[]{
+                R.drawable.history,
+                R.drawable.science,
+                R.drawable.nature};
+
+        for(JSONObject o : jsonObjects) {
+            try {
+                int image = 0;
+                String category = o.get("category").toString();
+
+                switch (category) {
+                    case "HISTORY":
+                        image = 0;
+                        break;
+                    case "SCIENCE":
+                        image = 1;
+                        break;
+                    case "NATURE":
+                        image = 2;
+                        break;
+                    default:
+                        break;
+                }
+
+                Gallery gallery = new Gallery(o.get("name").toString(), o.get("description").toString(), covers[image]);
+                galleryList.add(gallery);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

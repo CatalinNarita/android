@@ -43,11 +43,10 @@ public class DashboardActivity extends AppCompatActivity {
 
     ProgressDialog pDialog;
 
+    UserSessionManager session;
+
     private RecyclerView recyclerView;
     private GalleriesAdapter adapter;
-    private List<Gallery> galleryList;
-
-    UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +59,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        galleryList = new ArrayList<>();
+        Bundle b = this.getIntent().getExtras();
+
+        ArrayList<Gallery> galleryList = b.getParcelableArrayList("galleries");
+
         adapter = new GalleriesAdapter(this, galleryList);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
@@ -69,7 +71,8 @@ public class DashboardActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
-        prepareGalleries();
+        adapter.notifyDataSetChanged();
+
     }
 
     private void initCollapsingToolbar() {
@@ -121,52 +124,6 @@ public class DashboardActivity extends AppCompatActivity {
         ActivityCompat.startActivity(this, intent, options.toBundle());
 
     }*/
-    /**
-     * Adding few albums for testing
-     */
-    private void prepareGalleries() {
-        final RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        String URL = Constants.GET_ALL_GALLERIES_URL;
-
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Bearer " + session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
-
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Logging in...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                URL,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        System.out.println(response.toString());
-                        parseResponse(response);
-                        pDialog.hide();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        pDialog.hide();
-                    }
-                }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
-            }
-        };
-        requestQueue.add(jsonObjectRequest);
-
-        adapter.notifyDataSetChanged();
-    }
 
     /**
      * RecyclerView item decoration - give equal margin around grid item
@@ -214,38 +171,5 @@ public class DashboardActivity extends AppCompatActivity {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
-    private void parseResponse(JSONArray response) {
-        List<JSONObject> jsonObjects = new ArrayList<>();
-        try {
-            for (int i = 0; i < response.length(); i++) {
-                jsonObjects.add(response.getJSONObject(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        int[] covers = new int[]{
-                R.drawable.album1,
-                R.drawable.album2,
-                R.drawable.album3,
-                R.drawable.album4,
-                R.drawable.album5,
-                R.drawable.album6,
-                R.drawable.album7,
-                R.drawable.album8,
-                R.drawable.album9,
-                R.drawable.album10,
-                R.drawable.album11};
-
-        for(JSONObject o : jsonObjects) {
-            try {
-                galleryList.add(new Gallery(o.get("name").toString(), o.get("description").toString(), covers[0]));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        adapter.notifyDataSetChanged();
-
-    }
 }

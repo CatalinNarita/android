@@ -1,10 +1,16 @@
 package com.delta.activities;
 
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * Created by catal on 4/11/2018.
  */
 
-public class Gallery {
+public class Gallery implements Parcelable{
 
     private String name;
     private String description;
@@ -41,4 +47,35 @@ public class Gallery {
     public void setImage(int image) {
         this.image = image;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeInt(image);
+    }
+
+    public static final Parcelable.Creator<Gallery> CREATOR =
+            new Parcelable.Creator<Gallery>() {
+                public Gallery createFromParcel(Parcel in) {
+                   return new Gallery(in);
+                }
+
+                @Override
+                public Gallery[] newArray(int size) {
+                    return new Gallery[size];
+                }
+            };
+
+    private Gallery(Parcel in) {
+        this.name = in.readString();
+        this.description = in.readString();
+        this.image = in.readInt();
+    }
+
 }
