@@ -36,24 +36,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class DashboardActivity extends Activity {
 
-    UserSessionManager session;
-    CardView btnLogout;
-    Button btnDashboard;
-    ProgressDialog pDialog;
-
-    Tag detectedTag;
-    TextView tagContent;
-    NfcAdapter nfcAdapter;
-    IntentFilter[] readTagFilters;
-    PendingIntent pendingIntent;
-
-    CardView galleries;
-
+    private UserSessionManager session;
+    private ProgressDialog pDialog;
+    private NfcAdapter nfcAdapter;
+    private PendingIntent pendingIntent;
     private ArrayList<Gallery> galleryList;
-
-    private static int readCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,51 +54,16 @@ public class DashboardActivity extends Activity {
         setContentView(R.layout.activity_dashboard);
 
         session = new UserSessionManager(getApplicationContext());
-
         if (session.checkLogin()) {
             finish();
         }
-
-        HashMap<String, String> user = session.getUserDetails();
-
-        String fn = user.get(UserSessionManager.KEY_FIRST_NAME);
-        String ln = user.get(UserSessionManager.KEY_LAST_NAME);
-        String em = user.get(UserSessionManager.KEY_EMAIL);
-
         if (session.hasTokenExpired()) {
-            pDialog = new ProgressDialog(this);
-            pDialog.setMessage("Loading...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-            requestNewToken(session, fn, ln, em);
+            renewBearerToken(session);
         }
 
-        btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                session.logoutUser();
-            }
-        });
-
-
-        galleries = findViewById(R.id.galleriesId);
-        galleries.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), GalleriesActivity.class);
-                i.putParcelableArrayListExtra("galleries", galleryList);
-                startActivity(i);
-            }
-        });
-
-        // tagContent = findViewById(R.id.lblTagContent);
-
         galleryList = new ArrayList<>();
-
         prepareGalleries();
-
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -123,13 +81,12 @@ public class DashboardActivity extends Activity {
 
                 try {
                     String content = new String(msg.getRecords()[0].getPayload(), "UTF-8");
-                    tagContent.setText(content + readCount);
+                    //tagContent.setText(content + readCount);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-        readCount++;
     }
 
     @Override
@@ -159,10 +116,6 @@ public class DashboardActivity extends Activity {
 
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
 
-        final Map<String, String> headers = new HashMap<String, String>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Basic " + Constants.CLIENT_CREDENTIALS_ENCODED);
-
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -186,7 +139,7 @@ public class DashboardActivity extends Activity {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+                return VolleyUtils.getBasicAuthHeaders();
             }
         };
         requestQueue.add(jsonObjectRequest);
@@ -199,7 +152,6 @@ public class DashboardActivity extends Activity {
         Long expiresIn;
 
         try {
-
             accessToken = response.get("access_token").toString();
             refreshToken = response.get("refresh_token").toString();
             expiresIn = Long.parseLong(response.get("expires_in").toString());
@@ -209,11 +161,8 @@ public class DashboardActivity extends Activity {
             e.printStackTrace();
         }
 
-        // Starting DashboardActivity
         Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // Add new Flag to start new Activity
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
 
@@ -224,10 +173,6 @@ public class DashboardActivity extends Activity {
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         String URL = Constants.GET_ALL_GALLERIES_URL;
-
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Bearer " + session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
 
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Logging in...");
@@ -252,7 +197,7 @@ public class DashboardActivity extends Activity {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+                return VolleyUtils.getBearerAuthheaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
             }
         };
         requestQueue.add(jsonObjectRequest);
@@ -298,5 +243,31 @@ public class DashboardActivity extends Activity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @OnClick(R.id.galleriesId)
+    public void goToGalleriesActivity() {
+        Intent i = new Intent(getApplicationContext(), GalleriesActivity.class);
+        i.putParcelableArrayListExtra("galleries", galleryList);
+        startActivity(i);
+    }
+
+    public void renewBearerToken(UserSessionManager session) {
+        HashMap<String, String> user = session.getUserDetails();
+
+        String fn = user.get(UserSessionManager.KEY_FIRST_NAME);
+        String ln = user.get(UserSessionManager.KEY_LAST_NAME);
+        String em = user.get(UserSessionManager.KEY_EMAIL);
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+        requestNewToken(session, fn, ln, em);
+    }
+
+    @OnClick(R.id.btnLogout)
+    public void logoutUser(UserSessionManager session) {
+        session.logoutUser();
     }
 }
