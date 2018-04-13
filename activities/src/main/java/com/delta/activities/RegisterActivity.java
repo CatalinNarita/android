@@ -27,40 +27,32 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by naritc on 10-Apr-18.
  */
 
 public class RegisterActivity extends Activity {
-
-    TextView loginLink;
-    Button btnRegister;
     ProgressDialog pDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        loginLink = findViewById(R.id.register_screen_btn_login);
-        loginLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(i);
-            }
-        });
-
-        btnRegister = findViewById(R.id.register_screen_btn_register);
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerUser();
-            }
-        });
+        ButterKnife.bind(this);
     }
 
-    private void registerUser() {
+    @OnClick(R.id.register_screen_btn_login)
+    public void goToLoginActivity() {
+        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(i);
+    }
+
+    @OnClick(R.id.register_screen_btn_register)
+    public void registerUser() {
 
         final JSONObject jsonRequest = getUserData();
         final String stringRequest = jsonRequest.toString();
