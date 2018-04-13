@@ -5,9 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -22,11 +20,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -62,10 +58,6 @@ public class LoginActivity extends Activity {
         final String password = userCredentials.get(1).getText().toString();
 
         String URL = String.format(Constants.REQUEST_TOKEN_URL, username, password);
-
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Basic " + Constants.CLIENT_CREDENTIALS_ENCODED);
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -112,7 +104,7 @@ public class LoginActivity extends Activity {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+                return VolleyUtils.getBasicAuthHeaders();
             }
         };
         requestQueue.add(jsonObjectRequest);
@@ -120,10 +112,6 @@ public class LoginActivity extends Activity {
 
     private void getUserData(String username, final String accessToken, final String refreshToken, final Long expiresIn) {
         String URL = Constants.BASE_SECURE_URL + "/user/getByUsername/" + username;
-
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Bearer " + accessToken);
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -153,7 +141,7 @@ public class LoginActivity extends Activity {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+                return VolleyUtils.getBearerAuthheaders(accessToken);
             }
         };
         requestQueue.add(jsonObjectRequest);
