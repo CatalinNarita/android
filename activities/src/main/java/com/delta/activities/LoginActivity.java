@@ -5,17 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.ClientError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,7 +23,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by naritc on 10-Apr-18.
@@ -36,15 +37,9 @@ import java.util.Map;
 
 public class LoginActivity extends Activity {
 
-    Button btnLogin;
-    EditText username, password;
-    UserSessionManager session;
-    TextView registerLink;
+    @BindViews({R.id.usernameInput, R.id.passwordInput}) List<EditText> userCredentials;
     ProgressDialog pDialog;
-
-    ProgressBar progressBar;
-    AlphaAnimation inAnimation;
-    AlphaAnimation outAnimation;
+    UserSessionManager session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,35 +47,19 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         session = new UserSessionManager(getApplicationContext());
-
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
-
-        username = findViewById(R.id.usernameInput);
-        password = findViewById(R.id.passwordInput);
-
-        btnLogin = findViewById(R.id.login_screen_btn_login);
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                requestAccessToken(v);
-            }
-        });
-
-        registerLink = findViewById(R.id.login_screen_btn_register);
-        registerLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
-                startActivity(i);
-            }
-        });
+        ButterKnife.bind(this);
     }
 
+    @OnClick(R.id.login_screen_btn_register)
+    public void goToRegisterActivity() {
+        Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
+        startActivity(i);
+    }
+
+    @OnClick(R.id.login_screen_btn_login)
     public void requestAccessToken(final View view) {
-        final String username = ((EditText) findViewById(R.id.usernameInput)).getText().toString();
-        final String password = ((EditText) findViewById(R.id.passwordInput)).getText().toString();
+        final String username = userCredentials.get(0).getText().toString();
+        final String password = userCredentials.get(1).getText().toString();
 
         String URL = String.format(Constants.REQUEST_TOKEN_URL, username, password);
 
@@ -95,13 +74,6 @@ public class LoginActivity extends Activity {
         pDialog.setMessage("Please wat...");
         pDialog.setCancelable(false);
         pDialog.show();
-
-//        inAnimation = new AlphaAnimation(0f, 1f);
-//        inAnimation.setDuration(200);
-//        progressBar.setAnimation(inAnimation);
-//        progressBar.setVisibility(View.VISIBLE);
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-//                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
@@ -168,11 +140,6 @@ public class LoginActivity extends Activity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        /*outAnimation = new AlphaAnimation(1f, 0f);
-                        outAnimation.setDuration(200);
-                        progressBar.setAnimation(outAnimation);
-                        progressBar.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/
                         pDialog.hide();
                     }
                 },
