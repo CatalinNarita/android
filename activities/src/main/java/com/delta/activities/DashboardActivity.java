@@ -134,10 +134,10 @@ public class DashboardActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         pDialog.hide();
-                    }
-                }
+        }
+    }
         ) {
-            @Override
+        @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return VolleyUtils.getBasicAuthHeaders();
             }
@@ -267,7 +267,7 @@ public class DashboardActivity extends Activity {
     }
 
     @OnClick(R.id.btnLogout)
-    public void logoutUser(UserSessionManager session) {
+    public void logoutUser() {
         session.logoutUser();
     }
 }
