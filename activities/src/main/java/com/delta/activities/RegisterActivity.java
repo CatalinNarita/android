@@ -25,9 +25,11 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -36,6 +38,9 @@ import butterknife.OnClick;
  */
 
 public class RegisterActivity extends Activity {
+    @BindViews({R.id.firstNameInput, R.id.lastNameInput, R.id.emailInput, R.id.usernameInput, R.id.passwordInput})
+    List<EditText> userDetails;
+
     ProgressDialog pDialog;
 
     @Override
@@ -122,11 +127,11 @@ public class RegisterActivity extends Activity {
     }
 
     private JSONObject getUserData() {
-        String firstName = ((EditText) findViewById(R.id.firstNameInput)).getText().toString();
-        String lastName = ((EditText) findViewById(R.id.lastNameInput)).getText().toString();
-        String email = ((EditText) findViewById(R.id.emailInput)).getText().toString();
-        String username = ((EditText) findViewById(R.id.usernameInput)).getText().toString();
-        String password = ((EditText) findViewById(R.id.passwordInput)).getText().toString();
+        String firstName = userDetails.get(0).getText().toString();
+        String lastName = userDetails.get(1).getText().toString();
+        String email = userDetails.get(2).getText().toString();
+        String username = userDetails.get(3).getText().toString();
+        String password = userDetails.get(4).getText().toString();
 
         final JSONObject user = new JSONObject();
 
