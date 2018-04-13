@@ -21,37 +21,28 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by naritc on 11-Apr-18.
  */
 
 public class GalleriesActivity extends AppCompatActivity {
-    CardView mycard ;
-    LinearLayout ll;
-
-    ProgressDialog pDialog;
-
     UserSessionManager session;
 
-    private RecyclerView recyclerView;
+    @BindView(R.id.recycler_view) public RecyclerView recyclerView;
     private GalleriesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galleries);
-
-        initCollapsingToolbar();
+        ButterKnife.bind(this);
 
         session = new UserSessionManager(getApplicationContext());
-        ChangeBounds bounds = new ChangeBounds();
-        bounds.setDuration(300);
-        getWindow().setSharedElementEnterTransition(bounds);
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         Bundle b = this.getIntent().getExtras();
-
         ArrayList<Gallery> galleryList = b.getParcelableArrayList("galleries");
 
         adapter = new GalleriesAdapter(this, galleryList);
@@ -64,34 +55,6 @@ public class GalleriesActivity extends AppCompatActivity {
 
         adapter.notifyDataSetChanged();
 
-    }
-
-    private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(" ");
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
-
-        // hiding & showing the title when toolbar expanded & collapsed
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
-                    isShow = true;
-                } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
-                    isShow = false;
-                }
-            }
-        });
     }
 
     /**
