@@ -2,8 +2,11 @@ package com.delta.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -31,11 +34,12 @@ import butterknife.OnClick;
  * Created by naritc on 10-Apr-18.
  */
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends AppCompatActivity {
 
     @BindViews({R.id.usernameInput, R.id.passwordInput}) List<EditText> userCredentials;
     ProgressDialog pDialog;
     UserSessionManager session;
+    AlertDialog.Builder alertDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,20 +88,18 @@ public class LoginActivity extends Activity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
                         if (error instanceof NoConnectionError) {
-                            Toast.makeText(getApplicationContext(), "You are not connected to the internet!", Toast.LENGTH_LONG).show();
+                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
                         } else {
                             if(error.networkResponse != null) {
                                 int statusCode = error.networkResponse.statusCode;
                                 if (statusCode == 400) {
-                                    Toast.makeText(getApplicationContext(), "Wrong username of password!", Toast.LENGTH_LONG).show();
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.WRONG_CREDENTIALS, LoginActivity.this);
                                 } else {
-                                    Toast.makeText(getApplicationContext(), "Could not connect. Please try again later", Toast.LENGTH_LONG).show();
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE,  Constants.SERVER_DOWN, LoginActivity.this);
                                 }
                             }
                         }
-
                         pDialog.hide();
                     }
                 }
