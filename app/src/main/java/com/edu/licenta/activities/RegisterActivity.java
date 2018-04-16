@@ -1,14 +1,11 @@
-package com.delta.activities;
+package com.edu.licenta.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
@@ -18,9 +15,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.delta.activities.R;
+import com.edu.licenta.service.LoginService;
+import com.edu.licenta.utils.Constants;
+import com.edu.licenta.utils.UserSessionManager;
+import com.edu.licenta.utils.VolleyUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,18 +30,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
-import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by naritc on 10-Apr-18.
+ * Created by naritc
+ * on 10-Apr-18.
  */
 
 public class RegisterActivity extends Activity {
@@ -259,11 +257,11 @@ public class RegisterActivity extends Activity {
     }
 
     public boolean checkUserData(JSONObject jsonObject) {
-        String firstName = null;
-        String lastName = null;
-        String email = null;
-        String username = null;
-        String password = null;
+        String firstName = "";
+        String lastName = "";
+        String email = "";
+        String username = "";
+        String password = "";
 
         boolean error = false;
 

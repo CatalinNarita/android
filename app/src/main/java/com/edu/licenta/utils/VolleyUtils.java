@@ -1,4 +1,4 @@
-package com.delta.activities;
+package com.edu.licenta.utils;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by naritc on 13-Apr-18.
+ * Created by naritc
+ * on 13-Apr-18.
  */
 
 public class VolleyUtils {

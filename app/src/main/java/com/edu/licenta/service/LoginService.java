@@ -1,13 +1,17 @@
-package com.delta.activities;
+package com.edu.licenta.service;
 
 import android.content.Context;
 import android.content.Intent;
+
+import com.edu.licenta.activities.DashboardActivity;
+import com.edu.licenta.utils.UserSessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by naritc on 10-Apr-18.
+ * Created by naritc
+ * on 10-Apr-18.
  */
 
 public class LoginService {

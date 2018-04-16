@@ -1,24 +1,26 @@
-package com.delta.activities;
+package com.edu.licenta.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.delta.activities.R;
+import com.edu.licenta.service.LoginService;
+import com.edu.licenta.utils.Constants;
+import com.edu.licenta.utils.UserSessionManager;
+import com.edu.licenta.utils.VolleyUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,15 +33,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by naritc on 10-Apr-18.
+ * Created by naritc
+ * on 10-Apr-18.
  */
 
 public class LoginActivity extends AppCompatActivity {
 
-    @BindViews({R.id.usernameInput, R.id.passwordInput}) List<EditText> userCredentials;
+    @BindViews({R.id.usernameInput, R.id.passwordInput})
+    List<EditText> userCredentials;
     ProgressDialog pDialog;
     UserSessionManager session;
-    AlertDialog.Builder alertDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,15 +94,20 @@ public class LoginActivity extends AppCompatActivity {
                         if (error instanceof NoConnectionError) {
                             VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
                         } else {
-                            if(error.networkResponse != null) {
+                            if (error.networkResponse != null) {
                                 int statusCode = error.networkResponse.statusCode;
                                 if (statusCode == 400) {
                                     VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.WRONG_CREDENTIALS, LoginActivity.this);
                                 } else {
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE,  Constants.SERVER_DOWN, LoginActivity.this);
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
                                 }
                             }
                         }
+
+                        if (error instanceof TimeoutError) {
+                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
+                        }
+
                         pDialog.hide();
                     }
                 }

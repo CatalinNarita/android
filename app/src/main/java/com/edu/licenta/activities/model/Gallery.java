@@ -1,13 +1,11 @@
-package com.delta.activities;
+package com.edu.licenta.activities.model;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
- * Created by catal on 4/11/2018.
+ * Created by catal
+ * on 4/11/2018.
  */
 
 public class Gallery implements Parcelable{

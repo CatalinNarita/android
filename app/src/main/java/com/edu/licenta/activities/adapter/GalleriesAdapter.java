@@ -1,6 +1,7 @@
-package com.delta.activities;
+package com.edu.licenta.activities.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,11 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.delta.activities.R;
+import com.edu.licenta.activities.model.Gallery;
 
 import java.util.List;
 
 /**
- * Created by catal on 4/11/2018.
+ * Created by catal
+ * on 4/11/2018.
  */
 
 public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyViewHolder> {
@@ -25,11 +29,11 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
     private Context mContext;
     private List<Gallery> galleryList;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, description;
-        public ImageView thumbnail, overflow;
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        private TextView name, description;
+        private ImageView thumbnail, overflow;
 
-        public MyViewHolder(View view) {
+        private MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
             description = view.findViewById(R.id.description);
@@ -45,7 +49,8 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.album_card, parent, false);
 
@@ -53,7 +58,7 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Gallery gallery = galleryList.get(position);
         holder.name.setText(gallery.getName());
         holder.description.setText(gallery.getDescription());
@@ -86,8 +91,7 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
      */
     class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
 
-        public MyMenuItemClickListener() {
-        }
+        MyMenuItemClickListener() {}
 
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {

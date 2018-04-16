@@ -1,23 +1,19 @@
-package com.delta.activities;
+package com.edu.licenta.activities;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.ChangeBounds;
 import android.util.TypedValue;
 import android.view.View;
-import android.widget.LinearLayout;
+
+import com.delta.activities.R;
+import com.edu.licenta.activities.adapter.GalleriesAdapter;
+import com.edu.licenta.activities.model.Gallery;
+import com.edu.licenta.utils.UserSessionManager;
 
 import java.util.ArrayList;
 
@@ -25,7 +21,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by naritc on 11-Apr-18.
+ * Created by naritc
+ * on 11-Apr-18.
  */
 
 public class GalleriesActivity extends AppCompatActivity {
@@ -43,13 +40,17 @@ public class GalleriesActivity extends AppCompatActivity {
         session = new UserSessionManager(getApplicationContext());
 
         Bundle b = this.getIntent().getExtras();
-        ArrayList<Gallery> galleryList = b.getParcelableArrayList("galleries");
+        ArrayList<Gallery> galleryList = new ArrayList<>();
+
+        if(b != null) {
+            galleryList = b.getParcelableArrayList("galleries");
+        }
 
         adapter = new GalleriesAdapter(this, galleryList);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
@@ -66,7 +67,7 @@ public class GalleriesActivity extends AppCompatActivity {
         private int spacing;
         private boolean includeEdge;
 
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+        GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
             this.spanCount = spanCount;
             this.spacing = spacing;
             this.includeEdge = includeEdge;
@@ -98,9 +99,9 @@ public class GalleriesActivity extends AppCompatActivity {
     /**
      * Converting dp to pixel
      */
-    private int dpToPx(int dp) {
+    private int dpToPx() {
         Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, r.getDisplayMetrics()));
     }
 
 

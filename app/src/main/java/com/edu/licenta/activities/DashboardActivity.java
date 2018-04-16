@@ -1,21 +1,13 @@
-package com.delta.activities;
+package com.edu.licenta.activities;
 
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v7.widget.CardView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -26,6 +18,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.delta.activities.R;
+import com.edu.licenta.activities.model.Gallery;
+import com.edu.licenta.utils.Constants;
+import com.edu.licenta.utils.UserSessionManager;
+import com.edu.licenta.utils.VolleyUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,10 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * Created by naritc
+ * on 11-Apr-18.
+ */
 public class DashboardActivity extends Activity {
 
     private UserSessionManager session;
@@ -107,7 +107,7 @@ public class DashboardActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(nfcAdapter!= null) {
+        if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
     }
@@ -134,10 +134,10 @@ public class DashboardActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         pDialog.hide();
-        }
-    }
+                    }
+                }
         ) {
-        @Override
+            @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return VolleyUtils.getBasicAuthHeaders();
             }
@@ -218,7 +218,7 @@ public class DashboardActivity extends Activity {
                 R.drawable.science,
                 R.drawable.nature};
 
-        for(JSONObject o : jsonObjects) {
+        for (JSONObject o : jsonObjects) {
             try {
                 int image = 0;
                 String category = o.get("category").toString();
