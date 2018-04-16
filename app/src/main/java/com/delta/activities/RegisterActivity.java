@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -190,68 +191,121 @@ public class RegisterActivity extends Activity {
 
         final JSONObject jsonRequest = getUserData();
 
-        String checkUsernameURL = Constants.CHECK_USER;
-        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+        if(!checkUserData(jsonRequest)) {
 
-        JSONObject body = new JSONObject();
+            String checkUsernameURL = Constants.CHECK_USER;
+            final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+            JSONObject body = new JSONObject();
+
+            try {
+                body.put("username", jsonRequest.get("username"));
+                body.put("email", jsonRequest.get("email"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(checkUsernameURL);
+
+            pDialog = new ProgressDialog(this);
+
+            pDialog.setMessage("Registering...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+            JsonObjectRequest request = new JsonObjectRequest(
+                    Request.Method.POST,
+                    checkUsernameURL,
+                    body,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                if (response.get("username").toString().equals("true")) {
+                                    pDialog.hide();
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
+                                } else {
+                                    if (response.get("email").toString().equals("true")) {
+                                        pDialog.hide();
+                                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
+                                    } else {
+                                        registerUser(jsonRequest);
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                pDialog.hide();
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (error instanceof NoConnectionError) {
+                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
+                            } else {
+                                if (error.networkResponse != null) {
+                                    int statusCode = error.networkResponse.statusCode;
+                                    if (statusCode >= 500) {
+                                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
+            requestQueue.add(request);
+        }
+    }
+
+    public boolean checkUserData(JSONObject jsonObject) {
+        String firstName = null;
+        String lastName = null;
+        String email = null;
+        String username = null;
+        String password = null;
+
+        boolean error = false;
+
+        Pattern ptr = Pattern.compile(Constants.EMAIL_REGEX);
 
         try {
-            body.put("username", jsonRequest.get("username"));
-            body.put("email", jsonRequest.get("email"));
+            firstName = jsonObject.get("firstName").toString();
+            lastName = jsonObject.get("lastName").toString();
+            email = jsonObject.get("email").toString();
+            username = jsonObject.get("username").toString();
+            password = jsonObject.get("password").toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        System.out.println(checkUsernameURL);
+        System.out.println(ptr.matcher(email).matches());
 
-        pDialog = new ProgressDialog(this);
+        if (firstName.equals("")) {
+            userDetails.get(0).setError("First name is required!");
+            error = true;
+        }
+        if (lastName.equals("")) {
+            userDetails.get(1).setError("Last name is required!");
+            error = true;
+        }
+        if (email.equals("")) {
+            userDetails.get(2).setError("First name is required!");
+            error = true;
+        }
+        if (!ptr.matcher(email).matches()) {
+            userDetails.get(2).setError("Invalid email format");
+            error = true;
+        }
+        if (username.equals("") || username.length() < 6) {
+            userDetails.get(3).setError("Username is required! (min 6 characters)");
+            error = true;
+        }
+        if (password.equals("") || password.length() < 6) {
+            userDetails.get(4).setError("Password is required! (min 6 characters)");
+            error = true;
+        }
 
-        pDialog.setMessage("Registering...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                checkUsernameURL,
-                body,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            if (response.get("username").toString().equals("true")) {
-                                pDialog.hide();
-                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
-                            } else {
-                                if (response.get("email").toString().equals("true")){
-                                    pDialog.hide();
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
-                                } else {
-                                    registerUser(jsonRequest);
-                                }
-                            }
-                        } catch (JSONException e) {
-                            pDialog.hide();
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (error instanceof NoConnectionError) {
-                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
-                        } else {
-                            if(error.networkResponse != null) {
-                                int statusCode = error.networkResponse.statusCode;
-                                if (statusCode >= 500) {
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
-                                }
-                            }
-                        }
-                    }
-                }
-        );
-        requestQueue.add(request);
+        return error;
     }
-
 }

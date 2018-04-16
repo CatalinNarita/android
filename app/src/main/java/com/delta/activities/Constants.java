@@ -27,4 +27,7 @@ public class Constants {
     //user calls
     public static final String CHECK_USER = BASE_URL + "/user/checkUser";
 
+    //email regex
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
 }
