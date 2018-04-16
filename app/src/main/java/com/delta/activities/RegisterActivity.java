@@ -11,12 +11,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -27,6 +29,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -56,10 +61,8 @@ public class RegisterActivity extends Activity {
         startActivity(i);
     }
 
-    @OnClick(R.id.register_screen_btn_register)
-    public void registerUser() {
+    public void registerUser(final JSONObject jsonRequest) {
 
-        final JSONObject jsonRequest = getUserData();
         final String stringRequest = jsonRequest.toString();
 
         String URL = Constants.REGISTER_USER_URL;
@@ -68,12 +71,6 @@ public class RegisterActivity extends Activity {
         headers.put("Content-Type", "application/json");
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        pDialog = new ProgressDialog(this);
-
-        pDialog.setMessage("Registering...");
-        pDialog.setCancelable(false);
-        pDialog.show();
 
         StringRequest jsonObjectRequest = new StringRequest(
                 Request.Method.POST,
@@ -104,6 +101,7 @@ public class RegisterActivity extends Activity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        pDialog.hide();
                         error.printStackTrace();
                     }
                 }
@@ -186,4 +184,74 @@ public class RegisterActivity extends Activity {
         requestQueue.add(jsonObjectRequest);
 
     }
+
+    @OnClick(R.id.register_screen_btn_register)
+    public void checkIfUserExists() {
+
+        final JSONObject jsonRequest = getUserData();
+
+        String checkUsernameURL = Constants.CHECK_USER;
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JSONObject body = new JSONObject();
+
+        try {
+            body.put("username", jsonRequest.get("username"));
+            body.put("email", jsonRequest.get("email"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(checkUsernameURL);
+
+        pDialog = new ProgressDialog(this);
+
+        pDialog.setMessage("Registering...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                checkUsernameURL,
+                body,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (response.get("username").toString().equals("true")) {
+                                pDialog.hide();
+                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
+                            } else {
+                                if (response.get("email").toString().equals("true")){
+                                    pDialog.hide();
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
+                                } else {
+                                    registerUser(jsonRequest);
+                                }
+                            }
+                        } catch (JSONException e) {
+                            pDialog.hide();
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (error instanceof NoConnectionError) {
+                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
+                        } else {
+                            if(error.networkResponse != null) {
+                                int statusCode = error.networkResponse.statusCode;
+                                if (statusCode >= 500) {
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
+                                }
+                            }
+                        }
+                    }
+                }
+        );
+        requestQueue.add(request);
+    }
+
 }

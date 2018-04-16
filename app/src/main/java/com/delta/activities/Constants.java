@@ -21,5 +21,10 @@ public class Constants {
     public static final String WRONG_CREDENTIALS = "Wrong username or password!";
     public static final String SERVER_DOWN = "Could not connect. Please try again later";
     public static final String ERROR_TITLE = "Error";
+    public static final String USERNAME_IN_USE = "This username is already in use!";
+    public static final String EMAIL_IN_USE = "This email is already in use!";
+
+    //user calls
+    public static final String CHECK_USER = BASE_URL + "/user/checkUser";
 
 }
