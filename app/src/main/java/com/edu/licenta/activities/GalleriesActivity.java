@@ -11,8 +11,8 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.delta.activities.R;
-import com.edu.licenta.activities.adapter.GalleriesAdapter;
-import com.edu.licenta.activities.model.Gallery;
+import com.edu.licenta.adapter.GalleriesAdapter;
+import com.edu.licenta.model.Gallery;
 import com.edu.licenta.utils.UserSessionManager;
 
 import java.util.ArrayList;

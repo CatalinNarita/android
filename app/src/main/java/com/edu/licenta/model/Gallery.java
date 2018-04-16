@@ -1,4 +1,4 @@
-package com.edu.licenta.activities.model;
+package com.edu.licenta.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

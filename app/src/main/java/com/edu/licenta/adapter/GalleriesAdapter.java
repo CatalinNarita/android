@@ -1,4 +1,4 @@
-package com.edu.licenta.activities.adapter;
+package com.edu.licenta.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.delta.activities.R;
-import com.edu.licenta.activities.model.Gallery;
+import com.edu.licenta.model.Gallery;
 
 import java.util.List;
 
