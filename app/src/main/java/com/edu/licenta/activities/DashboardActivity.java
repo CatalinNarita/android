@@ -56,13 +56,14 @@ public class DashboardActivity extends Activity {
         session = new UserSessionManager(getApplicationContext());
         if (session.checkLogin()) {
             finish();
+        } else {
+            galleryList = new ArrayList<>();
+            prepareGalleries();
         }
         if (session.hasTokenExpired()) {
             renewBearerToken(session);
         }
 
-        galleryList = new ArrayList<>();
-        prepareGalleries();
         ButterKnife.bind(this);
     }
 
@@ -170,6 +171,9 @@ public class DashboardActivity extends Activity {
     }
 
     private void prepareGalleries() {
+
+        System.out.println("inside galleries method");
+
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         String URL = Constants.GET_ALL_GALLERIES_URL;
@@ -178,6 +182,8 @@ public class DashboardActivity extends Activity {
         pDialog.setMessage("Logging in...");
         pDialog.setCancelable(false);
 
+        final Long requestTime = System.currentTimeMillis();
+
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 URL,
@@ -185,6 +191,7 @@ public class DashboardActivity extends Activity {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
+                        System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
                         parseResponse(response);
                     }
                 },
