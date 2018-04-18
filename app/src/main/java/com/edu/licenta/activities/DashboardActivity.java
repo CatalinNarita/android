@@ -46,7 +46,6 @@ public class DashboardActivity extends Activity {
     private ProgressDialog pDialog;
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
-    private ArrayList<Gallery> galleryList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,11 +55,9 @@ public class DashboardActivity extends Activity {
         session = new UserSessionManager(getApplicationContext());
         if (session.checkLogin()) {
             finish();
-        } else {
-            galleryList = new ArrayList<>();
-            prepareGalleries();
         }
         if (session.hasTokenExpired()) {
+            System.out.println("test");
             renewBearerToken(session);
         }
 
@@ -114,7 +111,6 @@ public class DashboardActivity extends Activity {
     }
 
     public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
-
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -147,7 +143,6 @@ public class DashboardActivity extends Activity {
     }
 
     private void handleResponse(JSONObject response, String fn, String ln, String em) {
-
         String accessToken;
         String refreshToken;
         Long expiresIn;
@@ -170,92 +165,10 @@ public class DashboardActivity extends Activity {
         Toast.makeText(getApplicationContext(), "Refreshed logged in user token", Toast.LENGTH_LONG).show();
     }
 
-    private void prepareGalleries() {
-
-        System.out.println("inside galleries method");
-
-        final RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        String URL = Constants.GET_ALL_GALLERIES_URL;
-
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Logging in...");
-        pDialog.setCancelable(false);
-
-        final Long requestTime = System.currentTimeMillis();
-
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                URL,
-                null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
-                        parseResponse(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return VolleyUtils.getBearerAuthheaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
-            }
-        };
-        requestQueue.add(jsonObjectRequest);
-    }
-
-    private void parseResponse(JSONArray response) {
-        List<JSONObject> jsonObjects = new ArrayList<>();
-        try {
-            for (int i = 0; i < response.length(); i++) {
-                jsonObjects.add(response.getJSONObject(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        int[] covers = new int[]{
-                R.drawable.history,
-                R.drawable.science,
-                R.drawable.nature};
-
-        for (JSONObject o : jsonObjects) {
-            try {
-                int image = 0;
-                String category = o.get("category").toString();
-
-                switch (category) {
-                    case "HISTORY":
-                        image = 0;
-                        break;
-                    case "SCIENCE":
-                        image = 1;
-                        break;
-                    case "NATURE":
-                        image = 2;
-                        break;
-                    default:
-                        break;
-                }
-
-                Gallery gallery = new Gallery(o.get("name").toString(), o.get("description").toString(), covers[image]);
-                galleryList.add(gallery);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     @OnClick(R.id.galleriesId)
     public void goToGalleriesActivity() {
         Intent i = new Intent(getApplicationContext(), GalleriesActivity.class);
-        i.putParcelableArrayListExtra("galleries", galleryList);
+        // i.putParcelableArrayListExtra("galleries", galleryList);
         startActivity(i);
     }
 

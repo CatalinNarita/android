@@ -53,6 +53,12 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pDialog.dismiss();
+    }
+
     @OnClick(R.id.login_screen_btn_register)
     public void goToRegisterActivity() {
         Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
@@ -68,11 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        pDialog = new ProgressDialog(this);
-        pDialog.setTitle("Trying to log in..");
-        pDialog.setMessage("Please wat...");
-        pDialog.setCancelable(false);
-        pDialog.show();
+        pDialog = VolleyUtils.buildProgressDialog("Trying to log in..", "Please wat...", this);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,

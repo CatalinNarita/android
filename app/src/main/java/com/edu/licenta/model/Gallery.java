@@ -76,4 +76,12 @@ public class Gallery implements Parcelable{
         this.image = in.readInt();
     }
 
+    @Override
+    public String toString() {
+        return "Gallery{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", image=" + image +
+                '}';
+    }
 }

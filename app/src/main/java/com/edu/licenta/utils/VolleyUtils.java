@@ -1,5 +1,6 @@
 package com.edu.licenta.utils;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
@@ -41,6 +42,16 @@ public class VolleyUtils {
             }
         });
         alertDialog.show();
+    }
+
+    public static ProgressDialog buildProgressDialog(String title, String content, Context context) {
+        ProgressDialog pDialog = new ProgressDialog(context);
+        pDialog.setTitle(title);
+        pDialog.setMessage(content);
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+        return pDialog;
     }
 
 }

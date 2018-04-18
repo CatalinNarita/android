@@ -181,7 +181,6 @@ public class RegisterActivity extends Activity {
             }
         };
         requestQueue.add(jsonObjectRequest);
-
     }
 
     @OnClick(R.id.register_screen_btn_register)
@@ -203,13 +202,7 @@ public class RegisterActivity extends Activity {
                 e.printStackTrace();
             }
 
-            System.out.println(checkUsernameURL);
-
-            pDialog = new ProgressDialog(this);
-
-            pDialog.setMessage("Registering...");
-            pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog = VolleyUtils.buildProgressDialog(null,"Registering...", this);
 
             JsonObjectRequest request = new JsonObjectRequest(
                     Request.Method.POST,
@@ -276,8 +269,6 @@ public class RegisterActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        System.out.println(ptr.matcher(email).matches());
 
         if (firstName.equals("")) {
             userDetails.get(0).setError("First name is required!");
