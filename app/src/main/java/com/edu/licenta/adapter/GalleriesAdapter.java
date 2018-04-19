@@ -1,6 +1,7 @@
 package com.edu.licenta.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.delta.activities.R;
+import com.edu.licenta.activities.ArtifactsActivity;
 import com.edu.licenta.model.Gallery;
 
 import java.util.List;
@@ -67,6 +69,11 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
         Glide.with(mContext).load(gallery.getImage()).into(holder.thumbnail);
 
         holder.overflow.setOnClickListener((View view) -> showPopupMenu(holder.overflow));
+        holder.thumbnail.setOnClickListener((View v) -> {
+            Intent intent = new Intent(v.getContext(), ArtifactsActivity.class);
+            intent.putExtra("galleryId", gallery.getId().toString());
+            v.getContext().startActivity(intent);
+        });
     }
 
     /**
@@ -86,7 +93,8 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
      */
     class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
 
-        MyMenuItemClickListener() {}
+        MyMenuItemClickListener() {
+        }
 
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {

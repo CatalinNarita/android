@@ -102,6 +102,7 @@ public class DashboardActivity extends Activity {
 
     public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
+        String userId = session.getUserDetails().get(UserSessionManager.KEY_USER_ID);
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -110,7 +111,7 @@ public class DashboardActivity extends Activity {
                 URL,
                 null,
                 (JSONObject response) -> {
-                    handleResponse(response, fn, ln, em);
+                    handleResponse(userId, response, fn, ln, em);
                     pDialog.hide();
                 },
                 (VolleyError error) -> {
@@ -126,7 +127,7 @@ public class DashboardActivity extends Activity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void handleResponse(JSONObject response, String fn, String ln, String em) {
+    private void handleResponse(String userId, JSONObject response, String fn, String ln, String em) {
         String accessToken;
         String refreshToken;
         Long expiresIn;
@@ -136,7 +137,7 @@ public class DashboardActivity extends Activity {
             refreshToken = response.get("refresh_token").toString();
             expiresIn = Long.parseLong(response.get("expires_in").toString());
 
-            session.createUserLoginSession(fn, ln, em, accessToken, refreshToken, expiresIn);
+            session.createUserLoginSession(userId, fn, ln, em, accessToken, refreshToken, expiresIn);
         } catch (JSONException e) {
             e.printStackTrace();
         }

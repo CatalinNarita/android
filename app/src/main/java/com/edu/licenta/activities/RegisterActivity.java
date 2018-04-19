@@ -75,6 +75,7 @@ public class RegisterActivity extends Activity {
                 URL,
                 (String response) -> {
                     JSONObject jsonResponse;
+                    String userId = null;
                     String username = null;
                     String password = null;
                     String firstName = null;
@@ -82,6 +83,7 @@ public class RegisterActivity extends Activity {
                     String email = null;
                     try {
                         jsonResponse = new JSONObject(response);
+                        userId = jsonResponse.get("id").toString();
                         username = jsonResponse.get("username").toString();
                         password = jsonRequest.get("password").toString();
                         firstName = jsonRequest.get("firstName").toString();
@@ -91,7 +93,7 @@ public class RegisterActivity extends Activity {
                         e.printStackTrace();
                     }
 
-                    doAutoLogin(username, password, firstName, lastName, email);
+                    doAutoLogin(userId, username, password, firstName, lastName, email);
                 },
                 (VolleyError error) -> {
                     pDialog.hide();
@@ -138,7 +140,7 @@ public class RegisterActivity extends Activity {
         return user;
     }
 
-    private void doAutoLogin(String username, String password, final String firstName, final String lastName, final String email) {
+    private void doAutoLogin(String userId, String username, String password, final String firstName, final String lastName, final String email) {
 
         String URL = String.format(Constants.REQUEST_TOKEN_URL, username, password);
 
@@ -150,7 +152,7 @@ public class RegisterActivity extends Activity {
                 null,
                 (JSONObject response) -> {
                     LoginService loginService = new LoginService();
-                    loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email);
+                    loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email, userId);
                     pDialog.hide();
                 },
                 (VolleyError error) -> {

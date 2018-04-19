@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                 (JSONObject response) -> {
                     LoginService loginService = new LoginService();
                     try {
-                        loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString());
+                        loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString(), response.get("id").toString());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

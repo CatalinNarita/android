@@ -10,14 +10,24 @@ import android.os.Parcelable;
 
 public class Gallery implements Parcelable{
 
+    private Long id;
     private String name;
     private String description;
     private int image;
 
-    public Gallery(String name, String description, int image) {
+    public Gallery(Long id, String name, String description, int image) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.image = image;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

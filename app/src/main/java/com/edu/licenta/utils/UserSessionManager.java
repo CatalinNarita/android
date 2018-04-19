@@ -20,6 +20,7 @@ public class UserSessionManager {
     private Context _context;
     private static final String PREFER_NAME = "AndroidExamplePref";
     private static final String IS_USER_LOGIN = "IsUserLoggedIn";
+    public static final String KEY_USER_ID = "userId";
     public static final String KEY_FIRST_NAME = "firstName";
     public static final String KEY_LAST_NAME = "lastName";
     public static final String KEY_EMAIL = "email";
@@ -38,8 +39,9 @@ public class UserSessionManager {
     }
 
     //Create login session
-    public void createUserLoginSession(String firstName, String lastName, String email, String accessToken, String refreshToken, Long expiresIn){
+    public void createUserLoginSession(String userId, String firstName, String lastName, String email, String accessToken, String refreshToken, Long expiresIn){
         editor.putBoolean(IS_USER_LOGIN, true);
+        editor.putString(KEY_USER_ID, userId);
         editor.putString(KEY_FIRST_NAME, firstName);
         editor.putString(KEY_LAST_NAME, lastName);
         editor.putString(KEY_EMAIL, email);
@@ -81,20 +83,15 @@ public class UserSessionManager {
      * Get stored session data
      * */
     public HashMap<String, String> getUserDetails(){
-
-        //Use hashmap to store user credentials
         HashMap<String, String> user = new HashMap<>();
 
-        // user name
+        user.put(KEY_USER_ID, pref.getString(KEY_USER_ID, null));
         user.put(KEY_FIRST_NAME, pref.getString(KEY_FIRST_NAME, null));
         user.put(KEY_LAST_NAME, pref.getString(KEY_LAST_NAME, null));
         user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
-
-        // user access token
         user.put(KEY_ACCESS_TOKEN, pref.getString(KEY_ACCESS_TOKEN, null));
         user.put(KEY_REFRESH_TOKEN, pref.getString(KEY_REFRESH_TOKEN, null));
 
-        // return user
         return user;
     }
 

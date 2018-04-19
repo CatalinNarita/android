@@ -31,4 +31,7 @@ public class Constants {
     //email regex
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
+    //artifacts requests
+    public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s";
+
 }

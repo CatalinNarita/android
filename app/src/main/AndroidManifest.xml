@@ -37,6 +37,7 @@
         <activity android:name="com.edu.licenta.activities.LoginActivity" android:theme="@style/SignUpActivityTheme"/>
         <activity android:name="com.edu.licenta.activities.RegisterActivity" android:theme="@style/SignUpActivityTheme"/>
         <activity android:name="com.edu.licenta.activities.GalleriesActivity" android:theme="@style/SignUpActivityTheme"/>
+        <activity android:name="com.edu.licenta.activities.ArtifactsActivity" android:theme="@style/SignUpActivityTheme"/>
     </application>
 
 

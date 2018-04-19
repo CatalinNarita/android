@@ -1,6 +1,7 @@
 package com.edu.licenta.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by naritc
@@ -134,7 +136,7 @@ public class GalleriesActivity extends AppCompatActivity {
                         break;
                 }
 
-                Gallery gallery = new Gallery(o.get("name").toString(), o.get("description").toString(), covers[image]);
+                Gallery gallery = new Gallery(Long.parseLong(o.get("id").toString()), o.get("name").toString(), o.get("description").toString(), covers[image]);
                 galleryList.add(gallery);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -199,5 +201,11 @@ public class GalleriesActivity extends AppCompatActivity {
     private int dpToPx() {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, r.getDisplayMetrics()));
+    }
+
+    public void goToArtifactsActivity() {
+        System.out.println("clicked");
+        Intent i = new Intent(getApplicationContext(), ArtifactsActivity.class);
+        startActivity(i);
     }
 }
