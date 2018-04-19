@@ -14,8 +14,6 @@ public class Gallery implements Parcelable{
     private String description;
     private int image;
 
-    public Gallery(){}
-
     public Gallery(String name, String description, int image) {
         this.name = name;
         this.description = description;

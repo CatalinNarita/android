@@ -23,7 +23,7 @@ public class VolleyUtils {
         return headers;
     }
 
-    public static Map<String, String> getBearerAuthheaders(String accessToken) {
+    public static Map<String, String> getBearerAuthHeaders(String accessToken) {
         final Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization", "Bearer " + accessToken);
@@ -35,12 +35,7 @@ public class VolleyUtils {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
         alertDialog.setTitle(title);
         alertDialog.setMessage(content);
-        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
+        alertDialog.setPositiveButton("OK", (DialogInterface dialog, int id) -> dialog.dismiss());
         alertDialog.show();
     }
 

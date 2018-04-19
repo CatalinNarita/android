@@ -1,36 +1,26 @@
 package com.edu.licenta.activities;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
-import com.edu.licenta.model.Gallery;
 import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
@@ -44,8 +34,8 @@ public class DashboardActivity extends Activity {
 
     private UserSessionManager session;
     private ProgressDialog pDialog;
-    private NfcAdapter nfcAdapter;
-    private PendingIntent pendingIntent;
+    /*private NfcAdapter nfcAdapter;
+    private PendingIntent pendingIntent;*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +54,7 @@ public class DashboardActivity extends Activity {
         ButterKnife.bind(this);
     }
 
-    @Override
+    /*@Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
@@ -108,7 +98,7 @@ public class DashboardActivity extends Activity {
         if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
-    }
+    }*/
 
     public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
@@ -119,19 +109,13 @@ public class DashboardActivity extends Activity {
                 Request.Method.POST,
                 URL,
                 null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        handleResponse(response, fn, ln, em);
-                        pDialog.hide();
-                    }
+                (JSONObject response) -> {
+                    handleResponse(response, fn, ln, em);
+                    pDialog.hide();
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        pDialog.hide();
-                    }
+                (VolleyError error) -> {
+                    error.printStackTrace();
+                    pDialog.hide();
                 }
         ) {
             @Override

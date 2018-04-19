@@ -11,7 +11,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -74,35 +73,29 @@ public class RegisterActivity extends Activity {
         StringRequest jsonObjectRequest = new StringRequest(
                 Request.Method.POST,
                 URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        JSONObject jsonResponse;
-                        String username = null;
-                        String password = null;
-                        String firstName = null;
-                        String lastName = null;
-                        String email = null;
-                        try {
-                            jsonResponse = new JSONObject(response);
-                            username = jsonResponse.get("username").toString();
-                            password = jsonRequest.get("password").toString();
-                            firstName = jsonRequest.get("firstName").toString();
-                            lastName = jsonRequest.get("lastName").toString();
-                            email = jsonRequest.get("email").toString();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                (String response) -> {
+                    JSONObject jsonResponse;
+                    String username = null;
+                    String password = null;
+                    String firstName = null;
+                    String lastName = null;
+                    String email = null;
+                    try {
+                        jsonResponse = new JSONObject(response);
+                        username = jsonResponse.get("username").toString();
+                        password = jsonRequest.get("password").toString();
+                        firstName = jsonRequest.get("firstName").toString();
+                        lastName = jsonRequest.get("lastName").toString();
+                        email = jsonRequest.get("email").toString();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                        doAutoLogin(username, password, firstName, lastName, email);
-                    }
+                    doAutoLogin(username, password, firstName, lastName, email);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        pDialog.hide();
-                        error.printStackTrace();
-                    }
+                (VolleyError error) -> {
+                    pDialog.hide();
+                    error.printStackTrace();
                 }
         ) {
             @Override
@@ -149,35 +142,25 @@ public class RegisterActivity extends Activity {
 
         String URL = String.format(Constants.REQUEST_TOKEN_URL, username, password);
 
-        final Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Basic " + Constants.CLIENT_CREDENTIALS_ENCODED);
-
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 URL,
                 null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        LoginService loginService = new LoginService();
-                        loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email);
-                        pDialog.hide();
-                    }
+                (JSONObject response) -> {
+                    LoginService loginService = new LoginService();
+                    loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email);
+                    pDialog.hide();
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        pDialog.hide();
-                    }
+                (VolleyError error) -> {
+                    error.printStackTrace();
+                    pDialog.hide();
                 }
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return headers;
+                return VolleyUtils.getBasicAuthHeaders();
             }
         };
         requestQueue.add(jsonObjectRequest);
@@ -188,7 +171,7 @@ public class RegisterActivity extends Activity {
 
         final JSONObject jsonRequest = getUserData();
 
-        if(!checkUserData(jsonRequest)) {
+        if (!checkUserData(jsonRequest)) {
 
             String checkUsernameURL = Constants.CHECK_USER;
             final RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -202,44 +185,38 @@ public class RegisterActivity extends Activity {
                 e.printStackTrace();
             }
 
-            pDialog = VolleyUtils.buildProgressDialog(null,"Registering...", this);
+            pDialog = VolleyUtils.buildProgressDialog(null, "Registering...", this);
 
             JsonObjectRequest request = new JsonObjectRequest(
                     Request.Method.POST,
                     checkUsernameURL,
                     body,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                if (response.get("username").toString().equals("true")) {
-                                    pDialog.hide();
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
-                                } else {
-                                    if (response.get("email").toString().equals("true")) {
-                                        pDialog.hide();
-                                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
-                                    } else {
-                                        registerUser(jsonRequest);
-                                    }
-                                }
-                            } catch (JSONException e) {
+                    (JSONObject response) -> {
+                        try {
+                            if (response.get("username").toString().equals("true")) {
                                 pDialog.hide();
-                                e.printStackTrace();
+                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
+                            } else {
+                                if (response.get("email").toString().equals("true")) {
+                                    pDialog.hide();
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
+                                } else {
+                                    registerUser(jsonRequest);
+                                }
                             }
+                        } catch (JSONException e) {
+                            pDialog.hide();
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            if (error instanceof NoConnectionError) {
-                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
-                            } else {
-                                if (error.networkResponse != null) {
-                                    int statusCode = error.networkResponse.statusCode;
-                                    if (statusCode >= 500) {
-                                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
-                                    }
+                    (VolleyError error) -> {
+                        if (error instanceof NoConnectionError) {
+                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
+                        } else {
+                            if (error.networkResponse != null) {
+                                int statusCode = error.networkResponse.statusCode;
+                                if (statusCode >= 500) {
+                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
                                 }
                             }
                         }

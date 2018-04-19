@@ -66,12 +66,7 @@ public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyVi
         // loading album cover using Glide library
         Glide.with(mContext).load(gallery.getImage()).into(holder.thumbnail);
 
-        holder.overflow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(holder.overflow);
-            }
-        });
+        holder.overflow.setOnClickListener((View view) -> showPopupMenu(holder.overflow));
     }
 
     /**

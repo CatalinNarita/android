@@ -12,13 +12,9 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.Cache;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
@@ -32,7 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,25 +48,13 @@ public class GalleriesActivity extends AppCompatActivity {
     @BindView(R.id.recycler_view)
     public RecyclerView recyclerView;
 
-    private GalleriesAdapter adapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galleries);
         ButterKnife.bind(this);
-
         session = new UserSessionManager(getApplicationContext());
-
-        //Bundle b = this.getIntent().getExtras();
         prepareGalleries();
-
-        /*if(b != null) {
-            pDialog = VolleyUtils.buildProgressDialog(null, "Loading...", this);
-            galleryList = b.getParcelableArrayList("galleries");
-        }*/
-
-        adapter = new GalleriesAdapter(this, new ArrayList<>());
     }
 
     @Override
@@ -93,25 +76,14 @@ public class GalleriesActivity extends AppCompatActivity {
         final Long requestTime = System.currentTimeMillis();
         pDialog = VolleyUtils.buildProgressDialog("Loading galleries...", "Please wait...", this);
 
-        CacheRequest cacheRequest = new CacheRequest(
+        JsonArrayRequest cacheRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 URL,
-                (NetworkResponse response) ->  {
+                null,
+                (JSONArray response) ->  {
                         System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
-
-                        final String jsonString;
-                        JSONArray jsonArray = new JSONArray();
-
-                        try {
-                            jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                            jsonArray = new JSONArray(jsonString);
-                        } catch (JSONException | UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-
                         pDialog.hide();
-
-                        parseResponse(jsonArray);
+                        parseResponse(response);
                 },
                 (VolleyError error) ->  {
                         pDialog.hide();
@@ -120,7 +92,7 @@ public class GalleriesActivity extends AppCompatActivity {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return VolleyUtils.getBearerAuthheaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+                return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
             }
         };
         requestQueue.add(cacheRequest);
@@ -172,7 +144,7 @@ public class GalleriesActivity extends AppCompatActivity {
     }
 
     private void buildRecyclerView() {
-
+        GalleriesAdapter adapter = new GalleriesAdapter(this, new ArrayList<>());
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -228,64 +200,4 @@ public class GalleriesActivity extends AppCompatActivity {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, r.getDisplayMetrics()));
     }
-
-    private class CacheRequest extends Request<NetworkResponse> {
-        private final Response.Listener<NetworkResponse> mListener;
-        private final Response.ErrorListener mErrorListener;
-
-        public CacheRequest(int method, String url, Response.Listener<NetworkResponse> listener, Response.ErrorListener errorListener) {
-            super(method, url, errorListener);
-            this.mListener = listener;
-            this.mErrorListener = errorListener;
-        }
-
-
-        @Override
-        protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
-            Cache.Entry cacheEntry = HttpHeaderParser.parseCacheHeaders(response);
-            if (cacheEntry == null) {
-                cacheEntry = new Cache.Entry();
-            }
-            final long cacheHitButRefreshed = 3 * 60 * 1000; // in 3 minutes cache will be hit, but also refreshed on background
-            final long cacheExpired = 24 * 60 * 60 * 1000; // in 24 hours this cache entry expires completely
-            long now = System.currentTimeMillis();
-            final long softExpire = now + cacheHitButRefreshed;
-            final long ttl = now + cacheExpired;
-            cacheEntry.data = response.data;
-            cacheEntry.softTtl = softExpire;
-            cacheEntry.ttl = ttl;
-            String headerValue;
-            headerValue = response.headers.get("Date");
-            if (headerValue != null) {
-                cacheEntry.serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
-            }
-            headerValue = response.headers.get("Last-Modified");
-            if (headerValue != null) {
-                cacheEntry.lastModified = HttpHeaderParser.parseDateAsEpoch(headerValue);
-            }
-            cacheEntry.responseHeaders = response.headers;
-
-            System.out.println(response.data);
-            System.out.println(cacheEntry.data);
-
-            return Response.success(response, cacheEntry);
-        }
-
-        @Override
-        protected void deliverResponse(NetworkResponse response) {
-            mListener.onResponse(response);
-        }
-
-        @Override
-        protected VolleyError parseNetworkError(VolleyError volleyError) {
-            return super.parseNetworkError(volleyError);
-        }
-
-        @Override
-        public void deliverError(VolleyError error) {
-            mErrorListener.onErrorResponse(error);
-        }
-    }
-
-
 }

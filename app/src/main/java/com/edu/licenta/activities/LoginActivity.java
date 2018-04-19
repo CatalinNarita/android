@@ -11,7 +11,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -56,7 +55,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        pDialog.dismiss();
+        if (pDialog != null) {
+            pDialog.dismiss();
+        }
     }
 
     @OnClick(R.id.login_screen_btn_register)
@@ -80,32 +81,25 @@ public class LoginActivity extends AppCompatActivity {
                 Request.Method.POST,
                 URL,
                 null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            getUserData(username, response.get("access_token").toString(), response.get("refresh_token").toString(), Long.parseLong(response.get("expires_in").toString()));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                (JSONObject response) -> {
+                    try {
+                        getUserData(username, response.get("access_token").toString(), response.get("refresh_token").toString(), Long.parseLong(response.get("expires_in").toString()));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (error instanceof NoConnectionError) {
-                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
-                        } else {
-                            if (error.networkResponse != null) {
-                                int statusCode = error.networkResponse.statusCode;
-                                if (statusCode == 400) {
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.WRONG_CREDENTIALS, LoginActivity.this);
-                                } else {
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
-                                }
+                (VolleyError error) -> {
+                    if (error instanceof NoConnectionError) {
+                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
+                    } else {
+                        if (error.networkResponse != null) {
+                            int statusCode = error.networkResponse.statusCode;
+                            if (statusCode == 400) {
+                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.WRONG_CREDENTIALS, LoginActivity.this);
+                            } else {
+                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
                             }
                         }
-
                         if (error instanceof TimeoutError) {
                             VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
                         }
@@ -131,29 +125,23 @@ public class LoginActivity extends AppCompatActivity {
                 Request.Method.GET,
                 URL,
                 null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        LoginService loginService = new LoginService();
-                        try {
-                            loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        pDialog.hide();
+                (JSONObject response) -> {
+                    LoginService loginService = new LoginService();
+                    try {
+                        loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+                    pDialog.hide();
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                        pDialog.hide();
-                    }
+                (VolleyError error) -> {
+                    error.printStackTrace();
+                    pDialog.hide();
                 }
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return VolleyUtils.getBearerAuthheaders(accessToken);
+                return VolleyUtils.getBearerAuthHeaders(accessToken);
             }
         };
         requestQueue.add(jsonObjectRequest);
