@@ -7,17 +7,18 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.adapter.ArtifactsAdapter;
 import com.edu.licenta.model.Artifact;
-import com.edu.licenta.model.Gallery;
+import com.edu.licenta.utils.CacheRequest;
 import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
@@ -26,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,7 @@ public class ArtifactsActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private UserSessionManager session;
 
-    @BindView(R.id.myListView)
+    @BindView(R.id.artifactsListView)
     public ListView listView;
 
     @Override
@@ -81,14 +83,24 @@ public class ArtifactsActivity extends AppCompatActivity {
          final Long requestTime = System.currentTimeMillis();
          pDialog = VolleyUtils.buildProgressDialog("Loading artifacts...", "Please wait...", this);
 
-         JsonArrayRequest cacheRequest = new JsonArrayRequest(
+         CacheRequest cacheRequest = new CacheRequest(
                  Request.Method.GET,
                  URL,
-                 null,
-                 (JSONArray response) ->  {
+                 (NetworkResponse response) ->  {
                      System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
+
+                     final String jsonString;
+                     JSONArray jsonArray = new JSONArray();
+
+                     try {
+                         jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                         jsonArray = new JSONArray(jsonString);
+                     } catch (JSONException | UnsupportedEncodingException e) {
+                         e.printStackTrace();
+                     }
+
                      pDialog.hide();
-                     parseResponse(response);
+                     parseResponse(jsonArray);
                  },
                  (VolleyError error) ->  {
                      pDialog.hide();
@@ -96,7 +108,7 @@ public class ArtifactsActivity extends AppCompatActivity {
                  }
          ) {
              @Override
-             public Map<String, String> getHeaders() throws AuthFailureError {
+             public Map<String, String> getHeaders() {
                  return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
              }
          };
@@ -131,7 +143,7 @@ public class ArtifactsActivity extends AppCompatActivity {
             }
         }
 
-        artifactsAdapter = new ArtifactsAdapter(getApplicationContext(), R.layout.row, artifactList);
+        artifactsAdapter = new ArtifactsAdapter(getApplicationContext(), R.layout.row_artifacts, artifactList);
 
         if (listView != null) {
             listView.setAdapter(artifactsAdapter);

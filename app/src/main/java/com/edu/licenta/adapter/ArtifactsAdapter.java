@@ -46,7 +46,7 @@ public class ArtifactsAdapter extends ArrayAdapter<Artifact> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View row = convertView;
-        ArtifactHolder holder = null;
+        ArtifactHolder holder;
 
         if(row == null) {
             LayoutInflater inflater = LayoutInflater.from(context);

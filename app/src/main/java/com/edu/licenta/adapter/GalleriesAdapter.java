@@ -1,117 +1,73 @@
 package com.edu.licenta.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.delta.activities.R;
-import com.edu.licenta.activities.ArtifactsActivity;
 import com.edu.licenta.model.Gallery;
 
 import java.util.List;
 
 /**
- * Created by catal
- * on 4/11/2018.
+ * Created by naritc
+ * on 19-Apr-18.
  */
 
-public class GalleriesAdapter extends RecyclerView.Adapter<GalleriesAdapter.MyViewHolder> {
+public class GalleriesAdapter extends ArrayAdapter<Gallery> {
 
-    private Context mContext;
-    private List<Gallery> galleryList;
+    private Context context;
+    private int layoutResourceId;
+    private List<Gallery> galleries;
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
-        private TextView name, description;
-        private ImageView thumbnail, overflow;
+    public GalleriesAdapter(@NonNull Context context, int resource, @NonNull List<Gallery> objects) {
+        super(context, resource, objects);
 
-        private MyViewHolder(View view) {
-            super(view);
-            name = view.findViewById(R.id.name);
-            description = view.findViewById(R.id.description);
-            thumbnail = view.findViewById(R.id.thumbnail);
-            overflow = view.findViewById(R.id.overflow);
-        }
+        this.context =  context;
+        this.layoutResourceId = resource;
+        this.galleries = objects;
     }
 
-
-    public GalleriesAdapter(Context mContext, List<Gallery> galleryList) {
-        this.mContext = mContext;
-        this.galleryList = galleryList;
-    }
-
+    @Nullable
     @Override
+    public Gallery getItem(int position) {
+        return super.getItem(position);
+    }
+
     @NonNull
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.album_card, parent, false);
-
-        return new MyViewHolder(itemView);
-    }
-
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        Gallery gallery = galleryList.get(position);
-        holder.name.setText(gallery.getName());
-        holder.description.setText(gallery.getDescription());
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        View row = convertView;
+        GalleriesHolder holder;
 
-        // loading album cover using Glide library
-        Glide.with(mContext).load(gallery.getImage()).into(holder.thumbnail);
+        if(row == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            row = inflater.inflate(layoutResourceId, parent, false);
 
-        holder.overflow.setOnClickListener((View view) -> showPopupMenu(holder.overflow));
-        holder.thumbnail.setOnClickListener((View v) -> {
-            Intent intent = new Intent(v.getContext(), ArtifactsActivity.class);
-            intent.putExtra("galleryId", gallery.getId().toString());
-            v.getContext().startActivity(intent);
-        });
-    }
+            holder = new GalleriesHolder();
+            holder.galleryName = row.findViewById(R.id.galleryName);
+            holder.galleryDescription = row.findViewById(R.id.galleryDescription);
 
-    /**
-     * Showing popup menu when tapping on 3 dots
-     */
-    private void showPopupMenu(View view) {
-        // inflate menu
-        PopupMenu popup = new PopupMenu(mContext, view);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_artifact, popup.getMenu());
-        popup.setOnMenuItemClickListener(new MyMenuItemClickListener());
-        popup.show();
-    }
-
-    /**
-     * Click listener for popup menu items
-     */
-    class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
-
-        MyMenuItemClickListener() {
+            row.setTag(holder);
+        } else {
+            holder = (GalleriesHolder) row.getTag();
         }
 
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            switch (menuItem.getItemId()) {
-                case R.id.action_write_review:
-                    Toast.makeText(mContext, "Write review", Toast.LENGTH_SHORT).show();
-                    return true;
-                default:
-            }
-            return false;
-        }
+        Gallery gallery = galleries.get(position);
 
+        holder.galleryName.setText(gallery.getName());
+        holder.galleryDescription.setText(gallery.getDescription());
+
+        return row;
     }
 
-    @Override
-    public int getItemCount() {
-        return galleryList.size();
+    private static class GalleriesHolder {
+        TextView galleryName;
+        TextView galleryDescription;
     }
-
 }

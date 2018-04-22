@@ -171,7 +171,7 @@ public class RegisterActivity extends Activity {
                 }
         ) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 return VolleyUtils.getBasicAuthHeaders();
             }
         };

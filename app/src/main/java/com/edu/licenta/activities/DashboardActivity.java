@@ -11,6 +11,7 @@ import android.util.Base64;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -66,7 +68,7 @@ public class DashboardActivity extends Activity {
         if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             byte[] tagIdBytes = tag.getId();
-            String  tagId = new String(tagIdBytes);
+            String tagId = new String(tagIdBytes);
 
             addDiscoveredArtifact(tagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
         }
@@ -89,6 +91,11 @@ public class DashboardActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        if (pDialog != null) {
+            pDialog.dismiss();
+        }
+
         if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
@@ -114,7 +121,7 @@ public class DashboardActivity extends Activity {
                 }
         ) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 return VolleyUtils.getBasicAuthHeaders();
             }
         };
@@ -177,23 +184,39 @@ public class DashboardActivity extends Activity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        JsonObjectRequest request = new JsonObjectRequest(
+        pDialog = VolleyUtils.buildProgressDialog("New artifact discovered!", "Please wat...", this);
+
+        StringRequest request = new StringRequest(
                 Request.Method.POST,
                 URL,
-                null,
-                System.out::println,
+                (String response) -> {
+                    goToArtifactActivity(response);
+                    System.out.println("AICI: " + response);
+                    pDialog.hide();
+                },
                 VolleyError::printStackTrace
-        ){
+        ) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
             }
         };
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(request);
     }
 
     private String getEncodedTagId(String tagId) {
         return Base64.encodeToString(tagId.getBytes(), Base64.NO_WRAP);
+    }
+
+    private void goToArtifactActivity(String galleryId) {
+        Intent i = new Intent(getApplicationContext(), ArtifactsActivity.class);
+        i.putExtra("galleryId", galleryId);
+        startActivity(i);
     }
 }
