@@ -1,8 +1,11 @@
 package com.edu.licenta.activities;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -11,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.utils.Constants;
@@ -34,8 +38,8 @@ public class DashboardActivity extends Activity {
 
     private UserSessionManager session;
     private ProgressDialog pDialog;
-    /*private NfcAdapter nfcAdapter;
-    private PendingIntent pendingIntent;*/
+    private NfcAdapter nfcAdapter;
+    private PendingIntent pendingIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,26 +58,16 @@ public class DashboardActivity extends Activity {
         ButterKnife.bind(this);
     }
 
-    /*@Override
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
         if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMessages != null) {
-                NdefMessage[] messages = new NdefMessage[rawMessages.length];
-                for (int i = 0; i < rawMessages.length; i++) {
-                    messages[i] = (NdefMessage) rawMessages[i];
-                }
-                NdefMessage msg = messages[0];
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            byte[] tagIdBytes = tag.getId();
+            String  tagId = new String(tagIdBytes);
 
-                try {
-                    String content = new String(msg.getRecords()[0].getPayload(), "UTF-8");
-                    //tagContent.setText(content + readCount);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            addDiscoveredArtifact(tagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
         }
     }
 
@@ -88,7 +82,6 @@ public class DashboardActivity extends Activity {
                     getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         }
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
-
     }
 
 
@@ -98,7 +91,7 @@ public class DashboardActivity extends Activity {
         if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
-    }*/
+    }
 
     public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
         String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
@@ -174,5 +167,30 @@ public class DashboardActivity extends Activity {
     @OnClick(R.id.btnLogout)
     public void logoutUser() {
         session.logoutUser();
+    }
+
+    public void addDiscoveredArtifact(String tagId, String userId) {
+        String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, "123test", userId);
+
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                URL,
+                null,
+                (JSONObject response) -> {
+                    System.out.println(response);
+                },
+                (VolleyError error) -> {
+                    error.printStackTrace();
+                }
+        ){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+            }
+        };
+
+        requestQueue.add(request);
     }
 }

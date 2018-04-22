@@ -1,8 +1,10 @@
 package com.edu.licenta.activities;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.EditText;
@@ -52,6 +54,14 @@ public class RegisterActivity extends Activity {
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
 
     @OnClick(R.id.register_screen_btn_login)
     public void goToLoginActivity() {

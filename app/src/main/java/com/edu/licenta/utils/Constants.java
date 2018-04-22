@@ -10,7 +10,7 @@ public class Constants {
     //server requests
     private static final String BASE_URL = "https://ancient-wildwood-65338.herokuapp.com";
     public static final String BASE_SECURE_URL = "https://ancient-wildwood-65338.herokuapp.com/secure";
-    private static final String CLIENT_CREDENTIALS = "android-oauth2-client-id:android-oauth2-client-pass";
+    private static final String CLIENT_CREDENTIALS = "android-oauth2-client-id:android-oauth2-client-pass"; //YW5kcm9pZC1vYXV0aDItY2xpZW50LWlkOmFuZHJvaWQtb2F1dGgyLWNsaWVudC1wYXNz
     public static final String REQUEST_TOKEN_URL = BASE_URL + "/oauth/token?grant_type=password&username=%s&password=%s";
     static final String CLIENT_CREDENTIALS_ENCODED = Base64.encodeToString(CLIENT_CREDENTIALS.getBytes(), Base64.NO_WRAP);
     public static final String REQUEST_NEW_TOKEN = BASE_URL + "/oauth/token?grant_type=refresh_token&refresh_token=%s";
@@ -33,5 +33,6 @@ public class Constants {
 
     //artifacts requests
     public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s";
+    public static final String ADD_DISCOVERED_ARTIFACT = BASE_SECURE_URL + "/discoveredArtifact/add/%s/%s";
 
 }
