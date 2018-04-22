@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -170,7 +171,9 @@ public class DashboardActivity extends Activity {
     }
 
     public void addDiscoveredArtifact(String tagId, String userId) {
-        String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, "123test", userId);
+        String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, getEncodedTagId(tagId), userId);
+
+        System.out.println(URL);
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -178,12 +181,8 @@ public class DashboardActivity extends Activity {
                 Request.Method.POST,
                 URL,
                 null,
-                (JSONObject response) -> {
-                    System.out.println(response);
-                },
-                (VolleyError error) -> {
-                    error.printStackTrace();
-                }
+                System.out::println,
+                VolleyError::printStackTrace
         ){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -192,5 +191,9 @@ public class DashboardActivity extends Activity {
         };
 
         requestQueue.add(request);
+    }
+
+    private String getEncodedTagId(String tagId) {
+        return Base64.encodeToString(tagId.getBytes(), Base64.NO_WRAP);
     }
 }
