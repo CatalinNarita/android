@@ -98,23 +98,15 @@ public class GalleriesActivity extends AppCompatActivity {
         final Long requestTime = System.currentTimeMillis();
         pDialog = VolleyUtils.buildProgressDialog("Loading galleries...", "Please wait...", this);
 
-        CacheRequest cacheRequest = new CacheRequest(
+        JsonArrayRequest cacheRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 URL,
-                (NetworkResponse response) -> {
+                null,
+                (JSONArray response) -> {
                     System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
 
-                    final String jsonString;
-                    JSONArray jsonArray = new JSONArray();
-
-                    try {
-                        jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                        jsonArray = new JSONArray(jsonString);
-                    } catch (JSONException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
                     pDialog.hide();
-                    parseResponse(jsonArray);
+                    parseResponse(response);
                 },
                 (VolleyError error) -> {
                     pDialog.hide();
