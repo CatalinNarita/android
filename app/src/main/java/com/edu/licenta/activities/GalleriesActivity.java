@@ -2,31 +2,21 @@ package com.edu.licenta.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
-import com.edu.licenta.adapter.ArtifactsAdapter;
 import com.edu.licenta.adapter.GalleriesAdapter;
 import com.edu.licenta.model.Gallery;
-import com.edu.licenta.utils.CacheRequest;
+import com.edu.licenta.utils.ArtifactsFetchInitiatorEnum;
 import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
@@ -35,14 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by naritc
@@ -70,19 +57,18 @@ public class GalleriesActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             String galleryId = galleryList.get(i).getId().toString();
-            goToArtifactsActivity(galleryId);
+            goToArtifactsActivity(galleryId, ArtifactsFetchInitiatorEnum.USER);
         });
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
-        System.out.println("RESUMED");
         listView.setOnItemClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             String galleryId = galleryList.get(i).getId().toString();
-            goToArtifactsActivity(galleryId);
+            goToArtifactsActivity(galleryId, ArtifactsFetchInitiatorEnum.FROM_USER_INTERACTION);
         });
-    }
+    }*/
 
     @Override
     protected void onPause() {
@@ -95,7 +81,7 @@ public class GalleriesActivity extends AppCompatActivity {
 
         String URL = Constants.GET_ALL_GALLERIES_URL;
 
-        final Long requestTime = System.currentTimeMillis();
+        final Long requestTimestamp = System.currentTimeMillis();
         pDialog = VolleyUtils.buildProgressDialog("Loading galleries...", "Please wait...", this);
 
         JsonArrayRequest cacheRequest = new JsonArrayRequest(
@@ -103,7 +89,7 @@ public class GalleriesActivity extends AppCompatActivity {
                 URL,
                 null,
                 (JSONArray response) -> {
-                    System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
+                    System.out.println("FETCH GALLERIES: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
 
                     pDialog.hide();
                     parseResponse(response);
@@ -143,9 +129,6 @@ public class GalleriesActivity extends AppCompatActivity {
             }
         }
 
-        System.out.println("PARSE RESPONSE");
-        System.out.println(listView);
-
         GalleriesAdapter galleriesAdapter = new GalleriesAdapter(getApplicationContext(), R.layout.row_galleries, galleryList);
         galleriesAdapter.notifyDataSetChanged();
 
@@ -154,9 +137,10 @@ public class GalleriesActivity extends AppCompatActivity {
         }
     }
 
-    private void goToArtifactsActivity(String galleryId) {
+    private void goToArtifactsActivity(String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
         Intent i = new Intent(getApplicationContext(), ArtifactsActivity.class);
         i.putExtra("galleryId", galleryId);
+        i.putExtra("artifactsFetchSource", artifactsFetchSource);
         startActivity(i);
     }
 }

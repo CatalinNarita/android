@@ -87,11 +87,16 @@ public class LoginActivity extends AppCompatActivity {
 
         pDialog = VolleyUtils.buildProgressDialog("Trying to log in..", "Please wat...", this);
 
+        Long requestTimestamp = System.currentTimeMillis();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 URL,
                 null,
                 (JSONObject response) -> {
+
+                    System.out.println("REQUEST ACCESS TOKEN RESPONSE TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
+
                     try {
                         getUserData(username, response.get("access_token").toString(), response.get("refresh_token").toString(), Long.parseLong(response.get("expires_in").toString()));
                     } catch (JSONException e) {
@@ -131,11 +136,16 @@ public class LoginActivity extends AppCompatActivity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
+        Long requestTimestamp = System.currentTimeMillis();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 URL,
                 null,
                 (JSONObject response) -> {
+
+                    System.out.println("USER LOGIN TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
+
                     LoginService loginService = new LoginService();
                     try {
                         loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString(), response.get("id").toString());

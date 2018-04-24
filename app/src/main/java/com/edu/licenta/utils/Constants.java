@@ -3,10 +3,11 @@ package com.edu.licenta.utils;
 import android.util.Base64;
 
 /**
- * Created by naritc
- * on 29-Mar-18.
+ * Class that stores application's credentials, request URLs, regexps etc.
+ * @author Catalin-Ioan Narita
  */
 public class Constants {
+
     //server requests
     private static final String BASE_URL = "https://ancient-wildwood-65338.herokuapp.com";
     public static final String BASE_SECURE_URL = "https://ancient-wildwood-65338.herokuapp.com/secure";
@@ -29,7 +30,7 @@ public class Constants {
     public static final String CHECK_USER = BASE_URL + "/user/checkUser";
 
     //email regex
-    public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+    public static final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     //artifacts requests
     public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s";

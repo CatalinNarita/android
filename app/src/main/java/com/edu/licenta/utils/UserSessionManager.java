@@ -9,8 +9,9 @@ import com.edu.licenta.activities.LoginActivity;
 import java.util.HashMap;
 
 /**
- * Created by naritc
- * on 10-Apr-18.
+ * Class used to store user information. It uses Android's SharedPreferences and
+ * SharedPreferences.Editor interfaces to store and manage user data
+ * @author Catalin-Ioan Narita
  */
 
 public class UserSessionManager {
@@ -19,7 +20,7 @@ public class UserSessionManager {
     private SharedPreferences.Editor editor;
     private Context _context;
     private static final String PREFER_NAME = "AndroidExamplePref";
-    private static final String IS_USER_LOGIN = "IsUserLoggedIn";
+    private static final String IS_USER_LOGGED_IN = "IsUserLoggedIn";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_FIRST_NAME = "firstName";
     public static final String KEY_LAST_NAME = "lastName";
@@ -38,9 +39,18 @@ public class UserSessionManager {
         editor.apply();
     }
 
-    //Create login session
+    /**
+     * Creates a new login session storing the provided user data
+     * @param userId the user's id
+     * @param firstName the user's first name
+     * @param lastName the user's last name
+     * @param email the user's email
+     * @param accessToken the user's access token
+     * @param refreshToken the user's refresh token
+     * @param expiresIn access token's remaining duration (in seconds)
+     */
     public void createUserLoginSession(String userId, String firstName, String lastName, String email, String accessToken, String refreshToken, Long expiresIn){
-        editor.putBoolean(IS_USER_LOGIN, true);
+        editor.putBoolean(IS_USER_LOGGED_IN, true);
         editor.putString(KEY_USER_ID, userId);
         editor.putString(KEY_FIRST_NAME, firstName);
         editor.putString(KEY_LAST_NAME, lastName);
@@ -53,10 +63,10 @@ public class UserSessionManager {
     }
 
     /**
-     * Check login method will check user login status
-     * If false it will redirect user to login page
-     * Else do anything
-     * */
+     * Checks whether the user is logged in or not
+     * @return if the user is not logged in the method will start a new LoginActivity,
+     * else, custom handling can be made based on this (i.e redirect to Dashboard, Start etc.)
+     */
     public boolean checkLogin(){
         // Check login status
         if(!this.isUserLoggedIn()){
@@ -78,10 +88,10 @@ public class UserSessionManager {
     }
 
 
-
     /**
-     * Get stored session data
-     * */
+     * Builds a hash map with the user's data
+     * @return the built hash map
+     */
     public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<>();
 
@@ -96,8 +106,8 @@ public class UserSessionManager {
     }
 
     /**
-     * Clear session details
-     * */
+     * Clears all user stored data and starts a new LoginActivity
+     */
     public void logoutUser(){
 
         // Clearing all user data from Shared Preferences
@@ -118,11 +128,18 @@ public class UserSessionManager {
     }
 
 
-    // Check for login
+    /**
+     * Checks whether the user logged in flag is set or not
+     * @return flag's value
+     */
     private boolean isUserLoggedIn(){
-        return pref.getBoolean(IS_USER_LOGIN, false);
+        return pref.getBoolean(IS_USER_LOGGED_IN, false);
     }
 
+    /**
+     * Checks whether the user's token has expired or not
+     * @return true if token expired, false otherwise
+     */
     public boolean hasTokenExpired() {
         long expireTime = pref.getLong(KEY_ACCESS_TOKEN_EXPIRE_TIME, 0L);
         long systemTime = System.currentTimeMillis() / 1000L;

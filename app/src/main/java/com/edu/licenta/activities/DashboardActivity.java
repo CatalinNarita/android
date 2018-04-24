@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +18,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
+import com.edu.licenta.utils.ArtifactsFetchInitiatorEnum;
 import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
@@ -184,13 +184,16 @@ public class DashboardActivity extends Activity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
+        Long requestTimestamp = System.currentTimeMillis();
+
         pDialog = VolleyUtils.buildProgressDialog("New artifact discovered!", "Please wat...", this);
 
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 URL,
                 (String response) -> {
-                    goToArtifactActivity(response);
+                    System.out.println("ADD NEW DISCOVERED ARTIFACT: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
+                    goToArtifactActivity(response, ArtifactsFetchInitiatorEnum.NFC);
                     System.out.println("AICI: " + response);
                     pDialog.hide();
                 },
@@ -214,9 +217,10 @@ public class DashboardActivity extends Activity {
         return Base64.encodeToString(tagId.getBytes(), Base64.NO_WRAP);
     }
 
-    private void goToArtifactActivity(String galleryId) {
+    private void goToArtifactActivity(String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
         Intent i = new Intent(getApplicationContext(), ArtifactsActivity.class);
         i.putExtra("galleryId", galleryId);
+        i.putExtra("artifactsFetchSource", artifactsFetchSource);
         startActivity(i);
     }
 }

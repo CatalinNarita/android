@@ -78,12 +78,15 @@ public class RegisterActivity extends Activity {
         final Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
 
+        Long requestTimestamp = System.currentTimeMillis();
+
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         StringRequest jsonObjectRequest = new StringRequest(
                 Request.Method.POST,
                 URL,
                 (String response) -> {
+                    System.out.println("USER REGISTER TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
                     JSONObject jsonResponse;
                     String userId = null;
                     String username = null;
@@ -156,11 +159,14 @@ public class RegisterActivity extends Activity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
+        Long requestTimestamp = System.currentTimeMillis();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 URL,
                 null,
                 (JSONObject response) -> {
+                    System.out.println("USER AUTO LOGIN TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
                     LoginService loginService = new LoginService();
                     loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email, userId);
                     pDialog.hide();
@@ -247,7 +253,7 @@ public class RegisterActivity extends Activity {
 
         boolean error = false;
 
-        Pattern ptr = Pattern.compile(Constants.EMAIL_REGEX);
+        Pattern ptr = Pattern.compile(Constants.EMAIL_REGEXP);
 
         try {
             firstName = jsonObject.get("firstName").toString();

@@ -18,6 +18,7 @@ import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.adapter.ArtifactsAdapter;
 import com.edu.licenta.model.Artifact;
+import com.edu.licenta.utils.ArtifactsFetchInitiatorEnum;
 import com.edu.licenta.utils.CacheRequest;
 import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
@@ -61,8 +62,9 @@ public class ArtifactsActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         String galleryId = intent.getStringExtra("galleryId");
+        ArtifactsFetchInitiatorEnum artifactsFetchSource = (ArtifactsFetchInitiatorEnum) intent.getSerializableExtra("artifactsFetchSource");
 
-        getUserDiscoveredArtifacts(session.getUserDetails().get(UserSessionManager.KEY_USER_ID), galleryId);
+        getUserDiscoveredArtifacts(session.getUserDetails().get(UserSessionManager.KEY_USER_ID), galleryId, artifactsFetchSource);
         ButterKnife.bind(this);
 
     }
@@ -75,41 +77,96 @@ public class ArtifactsActivity extends AppCompatActivity {
         }
     }
 
-    public void getUserDiscoveredArtifacts(String userId, String galleryId) {
-         final RequestQueue requestQueue = Volley.newRequestQueue(this);
+    public void getUserDiscoveredArtifacts(String userId, String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
+        String URL = String.format(Constants.GET_USER_DISCOVERED_ARTIFACTS, userId, galleryId);
+        pDialog = VolleyUtils.buildProgressDialog("Loading artifacts...", "Please wait...", this);
 
-         String URL = String.format(Constants.GET_USER_DISCOVERED_ARTIFACTS, userId, galleryId);
+        switch (artifactsFetchSource) {
+            case NFC:
+                makeNormalRequest(URL, pDialog);
+                break;
+            case USER:
+                makeCachedRequest(URL, pDialog);
+                break;
+            default:
+                break;
+        }
+    }
 
-         final Long requestTime = System.currentTimeMillis();
-         pDialog = VolleyUtils.buildProgressDialog("Loading artifacts...", "Please wait...", this);
+    private void makeNormalRequest(String URL, ProgressDialog pDialog) {
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+        final Long requestTimestamp = System.currentTimeMillis();
+        requestQueue.getCache().clear();
 
-        JsonArrayRequest cacheRequest = new JsonArrayRequest(
-                 Request.Method.GET,
-                 URL,
-                 null,
-                 (JSONArray response) ->  {
-                     System.out.println("Request took " + (System.currentTimeMillis() - requestTime) + " milliseconds to complete.");
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                URL,
+                null,
+                (JSONArray response) -> {
+                    System.out.println("FETCH ARTIFACTS FROM DB: " + (System.currentTimeMillis() - requestTimestamp) / 1000d + " seconds");
 
-                     pDialog.hide();
-                     parseResponse(response);
-                 },
-                 (VolleyError error) ->  {
-                     pDialog.hide();
-                     error.printStackTrace();
-                 }
-         ) {
-             @Override
-             public Map<String, String> getHeaders() {
-                 return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
-             }
-         };
+                    pDialog.hide();
+                    parseResponse(response);
+                },
+                (VolleyError error) -> {
+                    pDialog.hide();
+                    error.printStackTrace();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+            }
+        };
 
-        cacheRequest.setRetryPolicy(new DefaultRetryPolicy(
+        request.setRetryPolicy(new DefaultRetryPolicy(
                 (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-         requestQueue.add(cacheRequest);
+        requestQueue.add(request);
+    }
+
+    private void makeCachedRequest(String URL, ProgressDialog pDialog) {
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+        final Long requestTimestamp = System.currentTimeMillis();
+
+        CacheRequest request = new CacheRequest(
+                Request.Method.GET,
+                URL,
+                (NetworkResponse response) -> {
+                    System.out.println("FETCH ARTIFACTS FROM CACHE: " + (System.currentTimeMillis() - requestTimestamp) / 1000d + " seconds");
+
+                    final String jsonString;
+                    JSONArray jsonArray = new JSONArray();
+
+                    try {
+                        jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                        jsonArray = new JSONArray(jsonString);
+                    } catch (JSONException | UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                    pDialog.hide();
+                    parseResponse(jsonArray);
+                },
+                (VolleyError error) -> {
+                    pDialog.hide();
+                    error.printStackTrace();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
+            }
+        };
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        requestQueue.add(request);
     }
 
     private void parseResponse(JSONArray response) {
