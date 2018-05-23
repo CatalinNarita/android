@@ -1,12 +1,20 @@
 package com.edu.licenta.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -59,6 +67,9 @@ public class GalleriesActivity extends AppCompatActivity {
             String galleryId = galleryList.get(i).getId().toString();
             goToArtifactsActivity(galleryId, ArtifactsFetchInitiatorEnum.USER);
         });
+
+
+
     }
 
     /*@Override
@@ -89,7 +100,7 @@ public class GalleriesActivity extends AppCompatActivity {
                 URL,
                 null,
                 (JSONArray response) -> {
-                    System.out.println("FETCH GALLERIES: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
+                    System.out.println("FETCH GALLERIES: " + (System.currentTimeMillis() - requestTimestamp) / 1000d + " seconds");
 
                     pDialog.hide();
                     parseResponse(response);
@@ -135,6 +146,7 @@ public class GalleriesActivity extends AppCompatActivity {
         if (listView != null) {
             listView.setAdapter(galleriesAdapter);
         }
+
     }
 
     private void goToArtifactsActivity(String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
@@ -143,4 +155,6 @@ public class GalleriesActivity extends AppCompatActivity {
         i.putExtra("artifactsFetchSource", artifactsFetchSource);
         startActivity(i);
     }
+
+
 }

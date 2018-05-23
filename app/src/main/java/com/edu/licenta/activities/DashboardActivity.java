@@ -65,12 +65,13 @@ public class DashboardActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+        if (intent != null && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             byte[] tagIdBytes = tag.getId();
             String tagId = new String(tagIdBytes);
 
-            addDiscoveredArtifact(tagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
+            // addDiscoveredArtifact(tagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
+            System.out.println(tagId);
         }
     }
 
