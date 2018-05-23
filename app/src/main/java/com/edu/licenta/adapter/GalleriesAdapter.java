@@ -59,14 +59,14 @@ public class GalleriesAdapter extends ArrayAdapter<Gallery> {
             holder = new GalleriesHolder();
             holder.galleryName = row.findViewById(R.id.galleryName);
             holder.galleryDescription = row.findViewById(R.id.galleryDescription);
-            holder.detailsButton = row.findViewById(R.id.gallery_details_btn);
+            //holder.detailsButton = row.findViewById(R.id.gallery_details_btn);
 
-            holder.detailsButton.setOnClickListener((View v) -> {
-                    Intent i = new Intent(context, GalleryDetailsActivity.class);
-                    i.putExtra("galleryName", "asd");
-                    context.startActivity(i);
-                }
-            );
+//            holder.detailsButton.setOnClickListener((View v) -> {
+//                    Intent i = new Intent(context, GalleryDetailsActivity.class);
+//                    i.putExtra("galleryName", "asd");
+//                    context.startActivity(i);
+//                }
+//            );
 
             row.setTag(holder);
         } else {
@@ -84,6 +84,6 @@ public class GalleriesAdapter extends ArrayAdapter<Gallery> {
     private static class GalleriesHolder {
         TextView galleryName;
         TextView galleryDescription;
-        Button detailsButton;
+        //Button detailsButton;
     }
 }

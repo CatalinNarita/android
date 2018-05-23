@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -68,6 +69,12 @@ public class GalleriesActivity extends AppCompatActivity {
             goToArtifactsActivity(galleryId, ArtifactsFetchInitiatorEnum.USER);
         });
 
+        listView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
+            Intent intent = new Intent(getApplicationContext(), GalleryDetailsActivity.class);
+            intent.putExtra("position", "test");
+            startActivity(intent);
+            return true;
+        });
 
 
     }

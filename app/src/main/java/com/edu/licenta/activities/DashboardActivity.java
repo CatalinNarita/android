@@ -26,6 +26,7 @@ import com.edu.licenta.utils.VolleyUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -70,8 +71,8 @@ public class DashboardActivity extends Activity {
             byte[] tagIdBytes = tag.getId();
             String tagId = new String(tagIdBytes);
 
-            // addDiscoveredArtifact(tagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
-            System.out.println(tagId);
+            addDiscoveredArtifact(binaryToHexa(tagIdBytes), session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
+            System.out.println(binaryToHexa(tagIdBytes));
         }
     }
 
@@ -179,7 +180,7 @@ public class DashboardActivity extends Activity {
     }
 
     public void addDiscoveredArtifact(String tagId, String userId) {
-        String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, getEncodedTagId(tagId), userId);
+        String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, tagId, userId);
 
         System.out.println(URL);
 
@@ -224,4 +225,8 @@ public class DashboardActivity extends Activity {
         i.putExtra("artifactsFetchSource", artifactsFetchSource);
         startActivity(i);
     }
+    static String binaryToHexa(byte[] data) {
+        return String.format("%0" + (data.length * 2) + "X", new BigInteger(1, data));
+    }
+
 }
