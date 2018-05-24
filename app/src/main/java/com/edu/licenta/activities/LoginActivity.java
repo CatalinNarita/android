@@ -106,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                 (VolleyError error) -> {
                     if (error instanceof NoConnectionError) {
                         VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
+                        pDialog.hide();
                     } else {
                         if (error.networkResponse != null) {
                             int statusCode = error.networkResponse.statusCode;

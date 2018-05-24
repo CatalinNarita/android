@@ -1,21 +1,12 @@
 package com.edu.licenta.activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -71,7 +62,7 @@ public class GalleriesActivity extends AppCompatActivity {
 
         listView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             Intent intent = new Intent(getApplicationContext(), GalleryDetailsActivity.class);
-            intent.putExtra("position", "test");
+            intent.putExtra("position", "gallery " + i);
             startActivity(intent);
             return true;
         });
