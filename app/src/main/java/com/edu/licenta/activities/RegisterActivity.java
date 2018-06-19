@@ -3,7 +3,9 @@ package com.edu.licenta.activities;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -43,7 +45,7 @@ import butterknife.OnClick;
  */
 
 public class RegisterActivity extends Activity {
-    @BindViews({R.id.firstNameInput, R.id.lastNameInput, R.id.emailInput, R.id.usernameInput, R.id.passwordInput})
+    @BindViews({R.id.firstNameInput, R.id.lastNameInput, R.id.emailInput, R.id.usernameInput, R.id.passwordInput, R.id.repeatPasswordInput})
     List<EditText> userDetails;
 
     ProgressDialog pDialog;
@@ -136,21 +138,29 @@ public class RegisterActivity extends Activity {
         String lastName = userDetails.get(1).getText().toString();
         String email = userDetails.get(2).getText().toString();
         String username = userDetails.get(3).getText().toString();
-        String password = userDetails.get(4).getText().toString();
+        String password1 = userDetails.get(4).getText().toString();
+        String password = userDetails.get(5).getText().toString();
 
-        final JSONObject user = new JSONObject();
+        if (!password.equals(password1)) {
+            VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.password_match), RegisterActivity.this);
+        } else {
 
-        try {
-            user.put("firstName", firstName);
-            user.put("lastName", lastName);
-            user.put("email", email);
-            user.put("username", username);
-            user.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            final JSONObject user = new JSONObject();
+
+            try {
+                user.put("firstName", firstName);
+                user.put("lastName", lastName);
+                user.put("email", email);
+                user.put("username", username);
+                user.put("password", password);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return user;
         }
 
-        return user;
+        return null;
     }
 
     private void doAutoLogin(String userId, String username, String password, final String firstName, final String lastName, final String email) {
@@ -189,58 +199,61 @@ public class RegisterActivity extends Activity {
 
         final JSONObject jsonRequest = getUserData();
 
-        if (!checkUserData(jsonRequest)) {
+        if (jsonRequest != null) {
 
-            String checkUsernameURL = Constants.CHECK_USER;
-            final RequestQueue requestQueue = Volley.newRequestQueue(this);
+            if (!checkUserData(jsonRequest)) {
 
-            JSONObject body = new JSONObject();
+                String checkUsernameURL = Constants.CHECK_USER;
+                final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            try {
-                body.put("username", jsonRequest.get("username"));
-                body.put("email", jsonRequest.get("email"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                JSONObject body = new JSONObject();
 
-            pDialog = VolleyUtils.buildProgressDialog(null, "Registering...", this);
+                try {
+                    body.put("username", jsonRequest.get("username"));
+                    body.put("email", jsonRequest.get("email"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            JsonObjectRequest request = new JsonObjectRequest(
-                    Request.Method.POST,
-                    checkUsernameURL,
-                    body,
-                    (JSONObject response) -> {
-                        try {
-                            if (response.get("username").toString().equals("true")) {
-                                pDialog.hide();
-                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.USERNAME_IN_USE, RegisterActivity.this);
-                            } else {
-                                if (response.get("email").toString().equals("true")) {
+                pDialog = VolleyUtils.buildProgressDialog(null, getString(R.string.registering), this);
+
+                JsonObjectRequest request = new JsonObjectRequest(
+                        Request.Method.POST,
+                        checkUsernameURL,
+                        body,
+                        (JSONObject response) -> {
+                            try {
+                                if (response.get("username").toString().equals("true")) {
                                     pDialog.hide();
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.EMAIL_IN_USE, RegisterActivity.this);
+                                    VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.username_in_use), RegisterActivity.this);
                                 } else {
-                                    registerUser(jsonRequest);
+                                    if (response.get("email").toString().equals("true")) {
+                                        pDialog.hide();
+                                        VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.email_in_use), RegisterActivity.this);
+                                    } else {
+                                        registerUser(jsonRequest);
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                pDialog.hide();
+                                e.printStackTrace();
+                            }
+                        },
+                        (VolleyError error) -> {
+                            if (error instanceof NoConnectionError) {
+                                VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.no_connection), RegisterActivity.this);
+                            } else {
+                                if (error.networkResponse != null) {
+                                    int statusCode = error.networkResponse.statusCode;
+                                    if (statusCode >= 500) {
+                                        VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.server_down), RegisterActivity.this);
+                                    }
                                 }
                             }
-                        } catch (JSONException e) {
-                            pDialog.hide();
-                            e.printStackTrace();
                         }
-                    },
-                    (VolleyError error) -> {
-                        if (error instanceof NoConnectionError) {
-                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, RegisterActivity.this);
-                        } else {
-                            if (error.networkResponse != null) {
-                                int statusCode = error.networkResponse.statusCode;
-                                if (statusCode >= 500) {
-                                    VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, RegisterActivity.this);
-                                }
-                            }
-                        }
-                    }
-            );
-            requestQueue.add(request);
+                );
+                requestQueue.add(request);
+            }
         }
     }
 
@@ -266,27 +279,27 @@ public class RegisterActivity extends Activity {
         }
 
         if (firstName.equals("")) {
-            userDetails.get(0).setError("First name is required!");
+            userDetails.get(0).setError(getString(R.string.first_name_r));
             error = true;
         }
         if (lastName.equals("")) {
-            userDetails.get(1).setError("Last name is required!");
+            userDetails.get(1).setError(getString(R.string.last_name_r));
             error = true;
         }
         if (email.equals("")) {
-            userDetails.get(2).setError("First name is required!");
+            userDetails.get(2).setError(getString(R.string.email_r));
             error = true;
         }
         if (!ptr.matcher(email).matches()) {
-            userDetails.get(2).setError("Invalid email format");
+            userDetails.get(2).setError(getString(R.string.invalid_email));
             error = true;
         }
         if (username.equals("") || username.length() < 6) {
-            userDetails.get(3).setError("Username is required! (min 6 characters)");
+            userDetails.get(3).setError(getString(R.string.username_required));
             error = true;
         }
         if (password.equals("") || password.length() < 6) {
-            userDetails.get(4).setError("Password is required! (min 6 characters)");
+            userDetails.get(4).setError(getString(R.string.password_required));
             error = true;
         }
 

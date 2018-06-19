@@ -3,12 +3,14 @@ package com.edu.licenta.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by catal
  * on 4/11/2018.
  */
 
-public class Gallery implements Parcelable{
+public class Gallery implements Serializable{
 
     private Long id;
     private String name;
@@ -60,7 +62,7 @@ public class Gallery implements Parcelable{
         this.image = image;
     }
 
-    @Override
+    /*@Override
     public int describeContents() {
         return 0;
     }
@@ -88,7 +90,7 @@ public class Gallery implements Parcelable{
         this.name = in.readString();
         this.description = in.readString();
         this.image = in.readInt();
-    }
+    }*/
 
     @Override
     public String toString() {

@@ -3,7 +3,11 @@ package com.edu.licenta.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +74,46 @@ public class VolleyUtils {
         pDialog.show();
 
         return pDialog;
+    }
+
+    public static Map<String, String> getGTTSHeaders() {
+        final Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("X-Goog-Api-Key", "AIzaSyDj-26vXqo6xQpJjTfhtKlLH5GcGXzUrJc");
+
+        return headers;
+    }
+
+    public static JSONObject buildGTTSRequestBody(String galleryDescription){
+        String rawJSON = "{\n" +
+                "    \"input\":{\n" +
+                "    \t\"text\":\"" + galleryDescription + "\"\n" +
+                "     },\n" +
+                "    \"voice\":{\n" +
+                "    \t\"languageCode\":\"en-en\",\n" +
+                "    \t\"name\":\"en-GB-Standard-A\",\n" +
+                "    \t\"ssmlGender\":\"FEMALE\"\n" +
+                "    },\n" +
+                "    \"audioConfig\":{\n" +
+                "    \t\"audioEncoding\":\"MP3\"\n" +
+                "    }\n" +
+                "}";
+
+        JSONObject body = null;
+
+        try{
+            body = new JSONObject(rawJSON);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return body;
+    }
+
+    public static boolean checkIfConnAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }

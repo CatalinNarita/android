@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Museum guide</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings" translatable="false">Settings</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="noAccount">No account yet? Create one</string>
     <string name="alreadyMember">Already a member? Login</string>
-    <string name="login">Login</string>
+    <string name="login" translatable="false">Login</string>
     <string name="sign_up">Sign up</string>
     <string name="register">REGISTER</string>
     <string name="firstName">First Name</string>
@@ -16,11 +15,10 @@
     <string name="logout">Logout</string>
     <string name="logout_desc">Enough for me</string>
     <string name="dashboard">Dashboard</string>
-    <string name="transition_string">Transition test</string>
     <string name="write_review">Write Review</string>
-    <string name="backdrop_title">LOVE MUSIC</string>
-    <string name="backdrop_subtitle">This season top 20 albums</string>
-    <string name="login_text">LOGIN</string>
+    <string name="backdrop_title" translatable="false">LOVE MUSIC</string>
+    <string name="backdrop_subtitle" translatable="false">This season top 20 albums</string>
+    <string name="login_text" translatable="false">LOGIN</string>
     <string name="galleries">Galleries</string>
     <string name="galleries_desc">I want to explore</string>
     <string name="poi">Points of interest</string>
@@ -29,4 +27,29 @@
     <string name="poi_desc">I\'m hungry</string>
     <string name="settings">Settings</string>
     <string name="settings_desc">I\'ll do it myself</string>
+    <string name="first_name_r">First name is required!</string>
+    <string name="last_name_r">Last name is required!</string>
+    <string name="email_r">Email is required!</string>
+    <string name="invalid_email">Invalid email format</string>
+    <string name="password_required">Password is required(min 6 characters)</string>
+    <string name="username_required">Username is required(min 6 characters)</string>
+    <string name="change_language_button">Change language</string>
+    <string name="trying_to_log_in">Trying to log in...</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="registering">Registering...</string>
+    <string name="token_refresh">Refreshed logged in user token...</string>
+    <string name="new_artifact">New artifact discovered!</string>
+    <string name="loading_galleries">Loading galleries...</string>
+    <string name="loading_artifacts">Loading artifacts...</string>
+
+    <string name="no_connection">You are not connected to the internet!</string>
+    <string name="wrong_credentials">Wrong username or password!</string>
+    <string name="server_down">Could not connect. Please try again later</string>
+    <string name="error_title">Error</string>
+    <string name="username_in_use">This username is already taken!</string>
+    <string name="email_in_use">This email is already taken!</string>
+    <string name="record_sound">Record sound</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="password_match">Passwords do not match!</string>
+    <string name="close_btn">Close</string>
 </resources>

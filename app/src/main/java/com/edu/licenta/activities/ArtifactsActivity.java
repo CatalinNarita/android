@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -78,15 +79,16 @@ public class ArtifactsActivity extends AppCompatActivity {
     }
 
     public void getUserDiscoveredArtifacts(String userId, String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
-        String URL = String.format(Constants.GET_USER_DISCOVERED_ARTIFACTS, userId, galleryId);
-        pDialog = VolleyUtils.buildProgressDialog("Loading artifacts...", "Please wait...", this);
+        String locale = Locale.getDefault().getLanguage();
+        String URL = String.format(Constants.GET_USER_DISCOVERED_ARTIFACTS, userId, galleryId, locale);
+        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.loading_artifacts), getString(R.string.please_wait), this);
 
         switch (artifactsFetchSource) {
             case NFC:
                 makeNormalRequest(URL, pDialog);
                 break;
             case USER:
-                makeCachedRequest(URL, pDialog);
+                makeNormalRequest(URL, pDialog);
                 break;
             default:
                 break;
@@ -96,7 +98,9 @@ public class ArtifactsActivity extends AppCompatActivity {
     private void makeNormalRequest(String URL, ProgressDialog pDialog) {
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
         final Long requestTimestamp = System.currentTimeMillis();
-        requestQueue.getCache().clear();
+        //requestQueue.getCache().clear();
+
+        System.out.println(URL);
 
         JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
@@ -119,10 +123,10 @@ public class ArtifactsActivity extends AppCompatActivity {
             }
         };
 
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(request);
     }

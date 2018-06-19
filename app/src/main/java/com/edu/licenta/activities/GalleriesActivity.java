@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.ButterKnife;
@@ -49,6 +50,9 @@ public class GalleriesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galleries);
         ButterKnife.bind(this);
+
+        // boolean connAvailable = VolleyUtils.checkIfConnAvailable(getApplicationContext());
+
         session = new UserSessionManager(getApplicationContext());
         prepareGalleries();
         System.out.println("CREATED");
@@ -62,22 +66,11 @@ public class GalleriesActivity extends AppCompatActivity {
 
         listView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             Intent intent = new Intent(getApplicationContext(), GalleryDetailsActivity.class);
-            intent.putExtra("position", "gallery " + i);
+            intent.putExtra("gallery", galleryList.get(i));
             startActivity(intent);
             return true;
         });
-
-
     }
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        listView.setOnItemClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
-            String galleryId = galleryList.get(i).getId().toString();
-            goToArtifactsActivity(galleryId, ArtifactsFetchInitiatorEnum.FROM_USER_INTERACTION);
-        });
-    }*/
 
     @Override
     protected void onPause() {
@@ -88,12 +81,13 @@ public class GalleriesActivity extends AppCompatActivity {
     private void prepareGalleries() {
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        String URL = Constants.GET_ALL_GALLERIES_URL;
+        String URL = Constants.GET_ALL_GALLERIES_URL + Locale.getDefault().getLanguage();
+        System.out.println(Locale.getDefault().getLanguage());
 
         final Long requestTimestamp = System.currentTimeMillis();
-        pDialog = VolleyUtils.buildProgressDialog("Loading galleries...", "Please wait...", this);
+        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.loading_galleries), getString(R.string.please_wait), this);
 
-        JsonArrayRequest cacheRequest = new JsonArrayRequest(
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 URL,
                 null,
@@ -113,7 +107,7 @@ public class GalleriesActivity extends AppCompatActivity {
                 return VolleyUtils.getBearerAuthHeaders(session.getUserDetails().get(UserSessionManager.KEY_ACCESS_TOKEN));
             }
         };
-        requestQueue.add(cacheRequest);
+        requestQueue.add(jsonArrayRequest);
     }
 
     private void parseResponse(JSONArray response) {

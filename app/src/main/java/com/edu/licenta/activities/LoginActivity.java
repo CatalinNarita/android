@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -85,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        pDialog = VolleyUtils.buildProgressDialog("Trying to log in..", "Please wat...", this);
+        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.trying_to_log_in), getString(R.string.please_wait), this);
 
         Long requestTimestamp = System.currentTimeMillis();
 
@@ -105,19 +104,19 @@ public class LoginActivity extends AppCompatActivity {
                 },
                 (VolleyError error) -> {
                     if (error instanceof NoConnectionError) {
-                        VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.NO_CONNECTION, LoginActivity.this);
+                        VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.no_connection), LoginActivity.this);
                         pDialog.hide();
                     } else {
                         if (error.networkResponse != null) {
                             int statusCode = error.networkResponse.statusCode;
                             if (statusCode == 400) {
-                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.WRONG_CREDENTIALS, LoginActivity.this);
+                                VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.wrong_credentials), LoginActivity.this);
                             } else {
-                                VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
+                                VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.server_down), LoginActivity.this);
                             }
                         }
                         if (error instanceof TimeoutError) {
-                            VolleyUtils.buildAlertDialog(Constants.ERROR_TITLE, Constants.SERVER_DOWN, LoginActivity.this);
+                            VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.server_down), LoginActivity.this);
                         }
 
                         pDialog.hide();

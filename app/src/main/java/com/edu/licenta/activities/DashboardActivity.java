@@ -1,5 +1,6 @@
 package com.edu.licenta.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -14,8 +16,8 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.utils.ArtifactsFetchInitiatorEnum;
@@ -23,11 +25,13 @@ import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,10 +58,17 @@ public class DashboardActivity extends Activity {
         if (session.checkLogin()) {
             finish();
         }
+
+        System.out.println(VolleyUtils.checkIfConnAvailable(getApplicationContext()));
+
         if (session.hasTokenExpired()) {
             System.out.println("test");
             renewBearerToken(session);
         }
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                1);
 
         ButterKnife.bind(this);
     }
@@ -150,7 +161,7 @@ public class DashboardActivity extends Activity {
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
 
-        Toast.makeText(getApplicationContext(), "Refreshed logged in user token", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), getText(R.string.token_refresh), Toast.LENGTH_LONG).show();
     }
 
     @OnClick(R.id.galleriesId)
@@ -182,20 +193,26 @@ public class DashboardActivity extends Activity {
     public void addDiscoveredArtifact(String tagId, String userId) {
         String URL = String.format(Constants.ADD_DISCOVERED_ARTIFACT, tagId, userId);
 
-        System.out.println(URL);
-
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         Long requestTimestamp = System.currentTimeMillis();
+        String locale = Locale.getDefault().getLanguage();
 
-        pDialog = VolleyUtils.buildProgressDialog("New artifact discovered!", "Please wat...", this);
+        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.new_artifact), getString(R.string.please_wait), this);
 
-        StringRequest request = new StringRequest(
+        JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.POST,
                 URL,
-                (String response) -> {
-                    System.out.println("ADD NEW DISCOVERED ARTIFACT: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
-                    goToArtifactActivity(response, ArtifactsFetchInitiatorEnum.NFC);
+                null,
+                (JSONArray response) -> {
+                    System.out.println("ADD NEW DISCOVERED ARTIFACT: " + (System.currentTimeMillis() - requestTimestamp) / 1000d + " seconds");
+                    String galleryId = null;
+                    try {
+                        galleryId = locale.equals("en") ? String.valueOf((Integer)response.get(0)) : String.valueOf((Integer)response.get(1));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    goToArtifactActivity(galleryId, ArtifactsFetchInitiatorEnum.NFC);
                     System.out.println("AICI: " + response);
                     pDialog.hide();
                 },
@@ -225,8 +242,20 @@ public class DashboardActivity extends Activity {
         i.putExtra("artifactsFetchSource", artifactsFetchSource);
         startActivity(i);
     }
+
     static String binaryToHexa(byte[] data) {
         return String.format("%0" + (data.length * 2) + "X", new BigInteger(1, data));
     }
 
+    @OnClick(R.id.settingsId)
+    public void goToSettingsActivity() {
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.poiId)
+    public void goToPoiActivity() {
+        Intent intent = new Intent(getApplicationContext(), POIActivity.class);
+        startActivity(intent);
+    }
 }

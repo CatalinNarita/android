@@ -16,7 +16,7 @@ public class Constants {
     static final String CLIENT_CREDENTIALS_ENCODED = Base64.encodeToString(CLIENT_CREDENTIALS.getBytes(), Base64.NO_WRAP);
     public static final String REQUEST_NEW_TOKEN = BASE_URL + "/oauth/token?grant_type=refresh_token&refresh_token=%s";
     public static final String REGISTER_USER_URL = BASE_URL + "/user/add";
-    public static final String GET_ALL_GALLERIES_URL = BASE_URL + "/gallery/get/all";
+    public static final String GET_ALL_GALLERIES_URL = BASE_URL + "/gallery/get/all/";
 
     //error messages
     public static final String NO_CONNECTION = "You are not connected to the internet!";
@@ -33,7 +33,7 @@ public class Constants {
     public static final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     //artifacts requests
-    public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s";
+    public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s/%s";
     public static final String ADD_DISCOVERED_ARTIFACT = BASE_SECURE_URL + "/discoveredArtifact/add/%s/%s";
 
 }
