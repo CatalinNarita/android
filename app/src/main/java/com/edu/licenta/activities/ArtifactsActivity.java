@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -50,7 +52,6 @@ public class ArtifactsActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private UserSessionManager session;
 
-    @BindView(R.id.artifactsListView)
     public ListView listView;
 
     @Override
@@ -66,6 +67,15 @@ public class ArtifactsActivity extends AppCompatActivity {
         ArtifactsFetchInitiatorEnum artifactsFetchSource = (ArtifactsFetchInitiatorEnum) intent.getSerializableExtra("artifactsFetchSource");
 
         getUserDiscoveredArtifacts(session.getUserDetails().get(UserSessionManager.KEY_USER_ID), galleryId, artifactsFetchSource);
+
+        listView = findViewById(R.id.artifactsListView);
+
+        listView.setOnItemClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
+            Intent intent1 = new Intent(getApplicationContext(), ArtifactDetailsActivity.class);
+            intent1.putExtra("artifact", artifactList.get(i));
+            startActivity(intent1);
+        });
+
         ButterKnife.bind(this);
 
     }
@@ -188,7 +198,7 @@ public class ArtifactsActivity extends AppCompatActivity {
 
         for (JSONObject o : jsonObjects) {
             try {
-                Artifact artifact = new Artifact(o.get("name").toString(), o.get("tagId").toString());
+                Artifact artifact = new Artifact(Long.parseLong(o.get("id").toString()), o.get("name").toString(), o.get("textBasic").toString(), o.get("textAdvanced").toString(), o.get("tagId").toString());
                 artifactList.add(artifact);
             } catch (JSONException e) {
                 e.printStackTrace();

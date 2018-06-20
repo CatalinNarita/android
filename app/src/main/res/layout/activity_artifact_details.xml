@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:id="@+id/popup_element"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:background="@color/base">--><!--<TextView android:id="@+id/galleryName"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_centerHorizontal="true"--><!--android:layout_marginTop="10dp"--><!--android:textAppearance="?android:attr/textAppearanceMedium" />--><!--<TextView android:id="@+id/galleryDescription"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_marginStart="15dp"--><!--android:layout_below="@+id/galleryName"--><!--android:textAppearance="?android:attr/textAppearanceMedium" />--><!--<ImageButton android:id="@+id/btn_play_pause"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_above="@+id/close"--><!--android:src="@android:drawable/ic_media_play"/>--><!--<SeekBar--><!--android:id="@+id/seek_bar"--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:layout_toEndOf="@id/btn_play_pause"--><!--android:layout_above="@id/close"--><!--android:layout_marginBottom="15dp"/>--><!--<Button android:id="@+id/close"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_centerHorizontal="true"--><!--android:layout_alignParentBottom="true"--><!--android:text="@string/close_btn" />--><!--</RelativeLayout>-->
-
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_content"
@@ -66,16 +65,22 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/gallery_name_gallery_details"
+                        android:id="@+id/artifact_name_artifact_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
                     <TextView
-                        android:id="@+id/gallery_description_gallery_details"
+                        android:id="@+id/artifact_description_artifact_details"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageButton
+                        android:id="@+id/btn_change_description"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/cheese_ipsum" />
+                        android:layout_gravity="center"
+                        android:src="@drawable/switch_description"/>
 
                 </LinearLayout>
 
@@ -87,19 +92,19 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/btn_play_pause_gallery_details"
+                    android:id="@+id/btn_play_pause_artifact_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@android:drawable/ic_media_play" />
 
                 <SeekBar
-                    android:id="@+id/seek_bar_gallery_details"
+                    android:id="@+id/seek_bar_artifact_details"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_close_gallery_details"
+                android:id="@+id/btn_close_artifact_details"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -110,7 +115,7 @@
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_gallery_details"
+        android:id="@+id/fab_artifact_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

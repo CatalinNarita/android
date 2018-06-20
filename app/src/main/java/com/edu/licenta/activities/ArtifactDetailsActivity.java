@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
+import com.edu.licenta.model.Artifact;
 import com.edu.licenta.model.Gallery;
 import com.edu.licenta.utils.VolleyUtils;
 
@@ -35,23 +36,29 @@ import butterknife.OnClick;
 
 /**
  * Created by naritc
- * on 23-May-18.
+ * on 20-Jun-18.
  */
 
-public class GalleryDetailsActivity extends Activity {
-    @BindView(R.id.btn_play_pause_gallery_details)
+public class ArtifactDetailsActivity extends Activity {
+
+    @BindView(R.id.btn_play_pause_artifact_details)
     ImageButton playButton;
 
-    @BindView(R.id.seek_bar_gallery_details)
+    @BindView(R.id.seek_bar_artifact_details)
     SeekBar seekBar;
 
-    @BindViews({R.id.gallery_name_gallery_details, R.id.gallery_description_gallery_details})
+    @BindViews({R.id.artifact_name_artifact_details, R.id.artifact_description_artifact_details})
     List<TextView> gTextViews;
 
     MediaPlayer mp = new MediaPlayer();
     boolean paused = true;
-    File temp = null;
-    String galleryDescription;
+    String textBasic;
+    String textAdvanced;
+    boolean isBasicDescription = true;
+    File tempBasic = null;
+    File tempAdvanced = null;
+    FileInputStream fisBasic;
+    FileInputStream fisAdvanced;
     Handler mSeekBarUpdateHandler = new Handler();
     Runnable mUpdateSeekBar = new Runnable() {
         @Override
@@ -64,15 +71,18 @@ public class GalleryDetailsActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery_details);
+        setContentView(R.layout.activity_artifact_details);
         ButterKnife.bind(this);
 
-        Gallery gallery = (Gallery) getIntent().getSerializableExtra("gallery");
-        String galleryName = gallery.getName();
-        galleryDescription = gallery.getDescription();
+        Artifact artifact = (Artifact) getIntent().getSerializableExtra("artifact");
+        String artifactName = artifact.getName();
+        textBasic = artifact.getTextBasic();
+        textAdvanced = artifact.getTextAdvanced();
 
-        gTextViews.get(0).setText(galleryName);
-        gTextViews.get(1).setText(galleryDescription);
+        System.out.println(artifact);
+
+        gTextViews.get(0).setText(artifactName);
+        gTextViews.get(1).setText(textBasic);
 
         mp.setOnCompletionListener((MediaPlayer mp) -> {
             playButton.setImageResource(android.R.drawable.ic_media_play);
@@ -96,30 +106,28 @@ public class GalleryDetailsActivity extends Activity {
 
             }
         });
-        getEncodedAudio(galleryDescription);
+        getEncodedAudio(textBasic, textAdvanced);
     }
 
-    private void getEncodedAudio(String galleryDescription) {
+    private void getEncodedAudio(String textBasic, String textAdvanced) {
         String URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize";
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        JSONObject body = VolleyUtils.buildGTTSRequestBody(galleryDescription);
+        JSONObject bodyBasic = VolleyUtils.buildGTTSRequestBody(textBasic);
+        JSONObject bodyAdvanced = VolleyUtils.buildGTTSRequestBody(textAdvanced);
 
-        JsonObjectRequest request = new JsonObjectRequest(
+        JsonObjectRequest requestBasic = new JsonObjectRequest(
                 Request.Method.POST,
                 URL,
-                body,
+                bodyBasic,
                 (JSONObject response) -> {
                     String audioContent;
                     try {
                         audioContent = (String) response.get("audioContent");
-                        buildAudio(audioContent);
+                        tempBasic = buildAudio(audioContent,"basic", "mp3");
                         try {
-                            FileInputStream fis = new FileInputStream(temp);
-                            mp.setDataSource(fis.getFD());
-                            mp.prepare();
-                            seekBar.setMax(mp.getDuration());
+                            fisBasic = new FileInputStream(tempBasic);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -137,22 +145,63 @@ public class GalleryDetailsActivity extends Activity {
             }
         };
 
-        requestQueue.add(request);
+        JsonObjectRequest requestAdvanced = new JsonObjectRequest(
+                Request.Method.POST,
+                URL,
+                bodyAdvanced,
+                (JSONObject response) -> {
+                    String audioContent;
+                    try {
+                        audioContent = (String) response.get("audioContent");
+                        tempAdvanced = buildAudio(audioContent,"advanced", "mp3");
+                        try {
+                            fisAdvanced = new FileInputStream(tempAdvanced);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                },
+                (VolleyError error) -> {
+                    System.out.println(error);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return VolleyUtils.getGTTSHeaders();
+            }
+        };
+
+        requestQueue.add(requestBasic);
+        requestQueue.add(requestAdvanced);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getEncodedAudio(galleryDescription);
     }
 
-    @OnClick(R.id.btn_close_gallery_details)
+    @OnClick(R.id.btn_close_artifact_details)
     public void dismissModal() {
-        GalleryDetailsActivity.this.finish();
+        ArtifactDetailsActivity.this.finish();
     }
 
-    @OnClick(R.id.btn_play_pause_gallery_details)
+    @OnClick(R.id.btn_play_pause_artifact_details)
     public void synthesizeText() {
+        try {
+            if (isBasicDescription) {
+                mp.setDataSource(fisBasic.getFD());
+                mp.prepare();
+                seekBar.setMax(mp.getDuration());
+            } else {
+                mp.setDataSource(fisAdvanced.getFD());
+                mp.prepare();
+                seekBar.setMax(mp.getDuration());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (paused) {
             try {
@@ -173,24 +222,38 @@ public class GalleryDetailsActivity extends Activity {
         }
     }
 
-    public void buildAudio(String base64Audio) {
+    public File buildAudio(String base64Audio, String fileName, String suffix) {
         byte[] soundBytes = Base64.decode(base64Audio, Base64.DEFAULT);
+        File file = null;
 
         try {
-            temp = File.createTempFile("description", "mp3", getCacheDir());
-            //temp.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(temp);
+            file = File.createTempFile(fileName, suffix, getCacheDir());
+            file.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(soundBytes);
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return file;
     }
 
-    @OnClick(R.id.fab_gallery_details)
-    public void goToGalleryReviewActivity() {
-        Intent i = new Intent(getApplicationContext(), GalleryReviewActivity.class);
+    @OnClick(R.id.fab_artifact_details)
+    public void goToArtifactReviewActivity() {
+        Intent i = new Intent(getApplicationContext(), ArtifactReviewActivity.class);
         startActivity(i);
+    }
+
+    @OnClick(R.id.btn_change_description)
+    public void changeDescription() {
+        mp.reset();
+        isBasicDescription = !isBasicDescription;
+        if (isBasicDescription) {
+            gTextViews.get(1).setText(textBasic);
+        } else {
+            gTextViews.get(1).setText(textAdvanced);
+        }
     }
 
     @Override
@@ -204,4 +267,5 @@ public class GalleryDetailsActivity extends Activity {
         super.onPause();
         mp.reset();
     }
+
 }

@@ -9,7 +9,7 @@ import android.util.Base64;
 public class Constants {
 
     //server requests
-    private static final String BASE_URL = "https://ancient-wildwood-65338.herokuapp.com";
+    public static final String BASE_URL = "https://ancient-wildwood-65338.herokuapp.com";
     public static final String BASE_SECURE_URL = "https://ancient-wildwood-65338.herokuapp.com/secure";
     private static final String CLIENT_CREDENTIALS = "android-oauth2-client-id:android-oauth2-client-pass"; //YW5kcm9pZC1vYXV0aDItY2xpZW50LWlkOmFuZHJvaWQtb2F1dGgyLWNsaWVudC1wYXNz
     public static final String REQUEST_TOKEN_URL = BASE_URL + "/oauth/token?grant_type=password&username=%s&password=%s";
