@@ -90,20 +90,15 @@
                     android:id="@+id/btn_play_pause_gallery_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_media_play" />
+                    android:src="@drawable/round_play_circle_outline_black_48"
+                    android:tint="@color/colorPrimary"
+                    android:background="@null"/>
 
                 <SeekBar
                     android:id="@+id/seek_bar_gallery_details"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_close_gallery_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/close_btn" />
 
         </LinearLayout>
 
@@ -115,8 +110,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:src="@drawable/review"
+        android:src="@drawable/round_star_rate_black_48"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|right|end" />
+
+    <RatingBar
+        android:id="@+id/dummy_rating_bar_gallery"
+        android:rating="3"
+        android:stepSize="1"
+        android:numStars="5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
 
 </android.support.design.widget.CoordinatorLayout>

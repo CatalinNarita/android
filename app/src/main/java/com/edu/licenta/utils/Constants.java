@@ -16,7 +16,7 @@ public class Constants {
     static final String CLIENT_CREDENTIALS_ENCODED = Base64.encodeToString(CLIENT_CREDENTIALS.getBytes(), Base64.NO_WRAP);
     public static final String REQUEST_NEW_TOKEN = BASE_URL + "/oauth/token?grant_type=refresh_token&refresh_token=%s";
     public static final String REGISTER_USER_URL = BASE_URL + "/user/add";
-    public static final String GET_ALL_GALLERIES_URL = BASE_URL + "/gallery/get/all/";
+    public static final String GET_ALL_GALLERIES_URL = BASE_SECURE_URL + "/gallery/get/all/";
 
     //error messages
     public static final String NO_CONNECTION = "You are not connected to the internet!";
@@ -36,4 +36,12 @@ public class Constants {
     public static final String GET_USER_DISCOVERED_ARTIFACTS = BASE_SECURE_URL + "/artifact/userDiscovered/%s/%s/%s";
     public static final String ADD_DISCOVERED_ARTIFACT = BASE_SECURE_URL + "/discoveredArtifact/add/%s/%s";
 
+    //gallery review
+    public static final String ADD_GALLERY_REVIEW = BASE_SECURE_URL + "/gallery/addReview/%s/%s";
+
+    //artifact review
+    public static final String ADD_ARTIFACT_REVIEW = BASE_SECURE_URL + "/artifact/addReview/%s/%s";
+
+    //text-to-speech API url
+    public static final String TTS_URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize";
 }

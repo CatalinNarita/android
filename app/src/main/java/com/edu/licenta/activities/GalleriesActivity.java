@@ -3,6 +3,7 @@ package com.edu.licenta.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -67,7 +68,13 @@ public class GalleriesActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             Intent intent = new Intent(getApplicationContext(), GalleryDetailsActivity.class);
             intent.putExtra("gallery", galleryList.get(i));
-            startActivity(intent);
+            intent.putExtra("img", galleryList.get(i).getImage());
+
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(GalleriesActivity.this,
+                            view.findViewById(R.id.galleryImage), "avatar");
+
+            startActivity(intent, options.toBundle());
             return true;
         });
     }
@@ -122,11 +129,24 @@ public class GalleriesActivity extends AppCompatActivity {
         }
 
         galleryList = new ArrayList<>();
+        int i = 1;
 
         for (JSONObject o : jsonObjects) {
             try {
                 Gallery gallery = new Gallery(Long.parseLong(o.get("id").toString()), o.get("name").toString(), o.get("description").toString());
+                switch (i) {
+                    case 1:
+                        gallery.setImage(R.drawable.cheese_1);
+                        break;
+                    case 2:
+                        gallery.setImage(R.drawable.cheese_2);
+                        break;
+                    case 3:
+                        gallery.setImage(R.drawable.cheese_3);
+                        break;
+                }
                 galleryList.add(gallery);
+                i++;
             } catch (JSONException e) {
                 e.printStackTrace();
             }

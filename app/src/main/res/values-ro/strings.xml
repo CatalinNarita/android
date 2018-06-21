@@ -45,4 +45,7 @@
     <string name="repeat_password">Repetati parola</string>
     <string name="password_match">Parolele nu se potrivesc!</string>
     <string name="close_btn">Închide</string>
+    <string name="cancel">Inchide</string>
+    <string name="submit">Salveaza</string>
+    <string name="submiting_review_title">Adaugare recenzie</string>
 </resources>

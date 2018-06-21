@@ -52,8 +52,8 @@
         <activity android:name="com.edu.licenta.activities.SettingsActivity" android:theme="@style/SignUpActivityTheme"/>
         <activity android:name="com.edu.licenta.activities.GalleryDetailsActivity" android:theme="@style/SignUpActivityTheme"/>
         <activity android:name="com.edu.licenta.activities.POIActivity" android:theme="@style/SignUpActivityTheme"/>
-        <activity android:name="com.edu.licenta.activities.GalleryReviewActivity" android:theme="@style/SignUpActivityTheme"/>
-        <activity android:name="com.edu.licenta.activities.ArtifactReviewActivity" android:theme="@style/SignUpActivityTheme"/>
+        <activity android:name="com.edu.licenta.activities.GalleryReviewActivity" android:theme="@style/Theme.Transparent"/>
+        <activity android:name="com.edu.licenta.activities.ArtifactReviewActivity" android:theme="@style/Theme.Transparent"/>
         <activity android:name="com.edu.licenta.activities.ArtifactDetailsActivity" android:theme="@style/SignUpActivityTheme"/>
     </application>
 

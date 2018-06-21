@@ -52,6 +52,9 @@
     <string name="repeat_password">Repeat password</string>
     <string name="password_match">Passwords do not match!</string>
     <string name="close_btn">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="submiting_review_title">Submitting review</string>
 
     <string name="cheese_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
     cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian

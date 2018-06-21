@@ -6,8 +6,14 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -19,7 +25,10 @@ import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.model.Artifact;
 import com.edu.licenta.model.Gallery;
+import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.VolleyUtils;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -39,7 +48,7 @@ import butterknife.OnClick;
  * on 20-Jun-18.
  */
 
-public class ArtifactDetailsActivity extends Activity {
+public class ArtifactDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.btn_play_pause_artifact_details)
     ImageButton playButton;
@@ -50,6 +59,10 @@ public class ArtifactDetailsActivity extends Activity {
     @BindViews({R.id.artifact_name_artifact_details, R.id.artifact_description_artifact_details})
     List<TextView> gTextViews;
 
+    @BindView(R.id.dummy_rating_bar_artifact)
+    RatingBar ratingBar;
+
+    Toolbar toolbar;
     MediaPlayer mp = new MediaPlayer();
     boolean paused = true;
     String textBasic;
@@ -60,6 +73,7 @@ public class ArtifactDetailsActivity extends Activity {
     FileInputStream fisBasic;
     FileInputStream fisAdvanced;
     Handler mSeekBarUpdateHandler = new Handler();
+    Artifact artifact;
     Runnable mUpdateSeekBar = new Runnable() {
         @Override
         public void run() {
@@ -74,10 +88,17 @@ public class ArtifactDetailsActivity extends Activity {
         setContentView(R.layout.activity_artifact_details);
         ButterKnife.bind(this);
 
-        Artifact artifact = (Artifact) getIntent().getSerializableExtra("artifact");
+        artifact = (Artifact) getIntent().getSerializableExtra("artifact");
         String artifactName = artifact.getName();
         textBasic = artifact.getTextBasic();
         textAdvanced = artifact.getTextAdvanced();
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener((View v) -> onBackPressed());
+
+        loadBackdrop(getIntent().getIntExtra("img", -1));
 
         System.out.println(artifact);
 
@@ -110,7 +131,7 @@ public class ArtifactDetailsActivity extends Activity {
     }
 
     private void getEncodedAudio(String textBasic, String textAdvanced) {
-        String URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize";
+        String URL = Constants.TTS_URL;
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -182,11 +203,6 @@ public class ArtifactDetailsActivity extends Activity {
         super.onResume();
     }
 
-    @OnClick(R.id.btn_close_artifact_details)
-    public void dismissModal() {
-        ArtifactDetailsActivity.this.finish();
-    }
-
     @OnClick(R.id.btn_play_pause_artifact_details)
     public void synthesizeText() {
         try {
@@ -242,6 +258,13 @@ public class ArtifactDetailsActivity extends Activity {
     @OnClick(R.id.fab_artifact_details)
     public void goToArtifactReviewActivity() {
         Intent i = new Intent(getApplicationContext(), ArtifactReviewActivity.class);
+        FloatingActionButton fab = findViewById(R.id.fab_artifact_details);
+        float x = fab.getX();
+        float y = fab.getY();
+        i.putExtra("x", x);
+        i.putExtra("y", y);
+        i.putExtra("rbWidth", ratingBar.getWidth());
+        i.putExtra("artifactId", artifact.getId());
         startActivity(i);
     }
 
@@ -254,6 +277,23 @@ public class ArtifactDetailsActivity extends Activity {
         } else {
             gTextViews.get(1).setText(textAdvanced);
         }
+    }
+
+    private void loadBackdrop(final int drawable) {
+        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+
+        Picasso.with(getApplicationContext())
+                .load(drawable)
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        ArtifactDetailsActivity.this.supportStartPostponedEnterTransition();
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
     }
 
     @Override

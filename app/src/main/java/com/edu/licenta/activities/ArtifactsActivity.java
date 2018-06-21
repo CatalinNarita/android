@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -73,7 +74,13 @@ public class ArtifactsActivity extends AppCompatActivity {
         listView.setOnItemClickListener((AdapterView<?> adapterView, View view, int i, long l) -> {
             Intent intent1 = new Intent(getApplicationContext(), ArtifactDetailsActivity.class);
             intent1.putExtra("artifact", artifactList.get(i));
-            startActivity(intent1);
+            intent1.putExtra("img", artifactList.get(i).getImage());
+
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(ArtifactsActivity.this,
+                            view.findViewById(R.id.artifactImage), "avatar");
+
+            startActivity(intent1, options.toBundle());
         });
 
         ButterKnife.bind(this);
@@ -195,11 +202,26 @@ public class ArtifactsActivity extends AppCompatActivity {
         }
 
         artifactList = new ArrayList<>();
+        int i = 1;
 
         for (JSONObject o : jsonObjects) {
             try {
                 Artifact artifact = new Artifact(Long.parseLong(o.get("id").toString()), o.get("name").toString(), o.get("textBasic").toString(), o.get("textAdvanced").toString(), o.get("tagId").toString());
+
+                switch (i) {
+                    case 1:
+                        artifact.setImage(R.drawable.cheese_1);
+                        break;
+                    case 2:
+                        artifact.setImage(R.drawable.cheese_2);
+                        break;
+                    case 3:
+                        artifact.setImage(R.drawable.cheese_3);
+                        break;
+                }
+
                 artifactList.add(artifact);
+                i++;
             } catch (JSONException e) {
                 e.printStackTrace();
             }

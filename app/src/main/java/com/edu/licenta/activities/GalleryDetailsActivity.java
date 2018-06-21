@@ -1,13 +1,18 @@
 package com.edu.licenta.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -18,7 +23,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.model.Gallery;
+import com.edu.licenta.utils.Constants;
 import com.edu.licenta.utils.VolleyUtils;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -38,7 +46,7 @@ import butterknife.OnClick;
  * on 23-May-18.
  */
 
-public class GalleryDetailsActivity extends Activity {
+public class GalleryDetailsActivity extends AppCompatActivity {
     @BindView(R.id.btn_play_pause_gallery_details)
     ImageButton playButton;
 
@@ -48,8 +56,15 @@ public class GalleryDetailsActivity extends Activity {
     @BindViews({R.id.gallery_name_gallery_details, R.id.gallery_description_gallery_details})
     List<TextView> gTextViews;
 
+    @BindView(R.id.dummy_rating_bar_gallery)
+    RatingBar ratingBar;
+
     MediaPlayer mp = new MediaPlayer();
     boolean paused = true;
+
+    Toolbar toolbar;
+    Gallery gallery;
+
     File temp = null;
     String galleryDescription;
     Handler mSeekBarUpdateHandler = new Handler();
@@ -67,12 +82,20 @@ public class GalleryDetailsActivity extends Activity {
         setContentView(R.layout.activity_gallery_details);
         ButterKnife.bind(this);
 
-        Gallery gallery = (Gallery) getIntent().getSerializableExtra("gallery");
+        gallery = (Gallery) getIntent().getSerializableExtra("gallery");
         String galleryName = gallery.getName();
         galleryDescription = gallery.getDescription();
 
         gTextViews.get(0).setText(galleryName);
         gTextViews.get(1).setText(galleryDescription);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener((View v) -> onBackPressed());
+
+        loadBackdrop(getIntent().getIntExtra("img", -1));
 
         mp.setOnCompletionListener((MediaPlayer mp) -> {
             playButton.setImageResource(android.R.drawable.ic_media_play);
@@ -100,7 +123,7 @@ public class GalleryDetailsActivity extends Activity {
     }
 
     private void getEncodedAudio(String galleryDescription) {
-        String URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize";
+        String URL = Constants.TTS_URL;
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -146,11 +169,6 @@ public class GalleryDetailsActivity extends Activity {
         getEncodedAudio(galleryDescription);
     }
 
-    @OnClick(R.id.btn_close_gallery_details)
-    public void dismissModal() {
-        GalleryDetailsActivity.this.finish();
-    }
-
     @OnClick(R.id.btn_play_pause_gallery_details)
     public void synthesizeText() {
 
@@ -158,7 +176,7 @@ public class GalleryDetailsActivity extends Activity {
             try {
                 mp.start();
                 paused = false;
-                playButton.setImageResource(android.R.drawable.ic_media_pause);
+                playButton.setImageResource(R.drawable.round_pause_circle_outline_black_48);
                 mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -167,7 +185,7 @@ public class GalleryDetailsActivity extends Activity {
             if (mp != null && mp.isPlaying()) {
                 mp.pause();
                 paused = true;
-                playButton.setImageResource(android.R.drawable.ic_media_play);
+                playButton.setImageResource(R.drawable.round_play_circle_outline_black_48);
                 mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
             }
         }
@@ -190,7 +208,31 @@ public class GalleryDetailsActivity extends Activity {
     @OnClick(R.id.fab_gallery_details)
     public void goToGalleryReviewActivity() {
         Intent i = new Intent(getApplicationContext(), GalleryReviewActivity.class);
+        FloatingActionButton fab = findViewById(R.id.fab_gallery_details);
+        float x = fab.getX();
+        float y = fab.getY();
+        i.putExtra("x", x);
+        i.putExtra("y", y);
+        i.putExtra("rbWidth", ratingBar.getWidth());
+        i.putExtra("galleryId", gallery.getId());
         startActivity(i);
+    }
+
+    private void loadBackdrop(final int drawable) {
+        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+
+        Picasso.with(getApplicationContext())
+                .load(drawable)
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        GalleryDetailsActivity.this.supportStartPostponedEnterTransition();
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
     }
 
     @Override

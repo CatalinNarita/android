@@ -14,6 +14,7 @@ public class Artifact implements Serializable {
     private String textBasic;
     private String textAdvanced;
     private String tagId;
+    private int image;
 
     public Artifact(Long id, String name, String textBasic, String textAdvanced, String tagId) {
         this.id = id;
@@ -61,5 +62,13 @@ public class Artifact implements Serializable {
 
     public void setTagId(String tagId) {
         this.tagId = tagId;
+    }
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
     }
 }

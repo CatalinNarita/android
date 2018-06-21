@@ -80,7 +80,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/switch_description"/>
+                        android:background="@null"
+                        android:tint="@color/colorPrimary"
+                        android:src="@drawable/round_swap_horiz_black_36"/>
 
                 </LinearLayout>
 
@@ -95,20 +97,15 @@
                     android:id="@+id/btn_play_pause_artifact_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_media_play" />
+                    android:background="@null"
+                    android:tint="@color/colorPrimary"
+                    android:src="@drawable/round_play_circle_outline_black_48" />
 
                 <SeekBar
                     android:id="@+id/seek_bar_artifact_details"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_close_artifact_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/close_btn" />
 
         </LinearLayout>
 
@@ -120,8 +117,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:src="@drawable/review"
+        android:src="@drawable/round_star_rate_black_48"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|right|end" />
+
+    <RatingBar
+        android:id="@+id/dummy_rating_bar_artifact"
+        android:rating="3"
+        android:stepSize="1"
+        android:numStars="5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
 
 </android.support.design.widget.CoordinatorLayout>

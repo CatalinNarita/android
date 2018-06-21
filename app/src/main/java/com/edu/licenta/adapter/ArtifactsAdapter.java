@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.delta.activities.R;
 import com.edu.licenta.model.Artifact;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -54,7 +56,7 @@ public class ArtifactsAdapter extends ArrayAdapter<Artifact> {
 
             holder = new ArtifactHolder();
             holder.name = row.findViewById(R.id.artifactName);
-            holder.tagId = row.findViewById(R.id.artifactTagId);
+            holder.artifactImage = row.findViewById(R.id.artifactImage);
 
             row.setTag(holder);
         } else {
@@ -64,13 +66,18 @@ public class ArtifactsAdapter extends ArrayAdapter<Artifact> {
         Artifact artifact = artifacts.get(position);
 
         holder.name.setText(artifact.getName());
-        holder.tagId.setText(artifact.getTagId());
+        holder.artifactImage.setImageResource(artifact.getImage());
+
+        Picasso.with(holder.artifactImage.getContext())
+                .load(artifact.getImage())
+                .fit()
+                .into(holder.artifactImage);
 
         return row;
     }
 
-    private static class ArtifactHolder {
+    private class ArtifactHolder {
         TextView name;
-        TextView tagId;
+        ImageView artifactImage;
     }
 }
