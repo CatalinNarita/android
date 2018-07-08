@@ -59,12 +59,22 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/record_sound"
                 android:textColor="@color/white" />
+            <Spinner
+                android:id="@+id/poi_spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"/>
+            <SeekBar
+                android:id="@+id/seek_bar_poi"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
             <TextView android:id="@+id/speech_result_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
+
 
     </android.support.v4.widget.NestedScrollView>
 

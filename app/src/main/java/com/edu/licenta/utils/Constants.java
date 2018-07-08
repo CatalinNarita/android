@@ -41,7 +41,39 @@ public class Constants {
 
     //artifact review
     public static final String ADD_ARTIFACT_REVIEW = BASE_SECURE_URL + "/artifact/addReview/%s/%s";
+    public static final String GET_ALL_ARTIFACT_REVIEWS_URL = BASE_SECURE_URL + "/artifact/getReview/%s";
 
     //text-to-speech API url
     public static final String TTS_URL = "https://texttospeech.googleapis.com/v1beta1/text:synthesize";
+
+    //gallery reviews
+    public static final String GET_ALL_GALLERY_REVIEWS_URL = BASE_SECURE_URL + "/gallery/getReview/%s";
+
+    public static float lastX = 0;
+    public static float lastY = 0;
+
+    //artifacts positions
+    public static float artifact1PosX = 90;
+    public static float artifact1PosY = 1630;
+
+    public static float artifact2PosX = 900;
+    public static float artifact2PosY = 1630;
+
+    public static float artifact21PosX = 90;
+    public static float artifact21PosY = 880;
+
+    public static float artifact22PosX = 900;
+    public static float artifact22PosY = 880;
+
+    public static float artifact41PosX = 90;
+    public static float artifact41PosY = 130;
+
+    public static float artifact42PosX = 900;
+    public static float artifact42PosY = 130;
+
+    //user position
+    public static float userPositionX = 0;
+    public static float userPositionY = 0;
+
+    public static boolean firstEnter = true;
 }

@@ -5,12 +5,12 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -53,18 +53,12 @@ public class DashboardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        session = new UserSessionManager(getApplicationContext());
+        loadLocale();
         setContentView(R.layout.activity_dashboard);
 
-        session = new UserSessionManager(getApplicationContext());
         if (session.checkLogin()) {
             finish();
-        }
-
-        System.out.println(VolleyUtils.checkIfConnAvailable(getApplicationContext()));
-
-        if (session.hasTokenExpired()) {
-            System.out.println("test");
-            renewBearerToken(session);
         }
 
         ActivityCompat.requestPermissions(this,
@@ -81,16 +75,52 @@ public class DashboardActivity extends Activity {
         if (intent != null && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             byte[] tagIdBytes = tag.getId();
-            String tagId = new String(tagIdBytes);
+            String hexaTagId = binaryToHexa(tagIdBytes);
 
-            addDiscoveredArtifact(binaryToHexa(tagIdBytes), session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
+            addDiscoveredArtifact(hexaTagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
+
+            updateUserPosition(hexaTagId);
+
             System.out.println(binaryToHexa(tagIdBytes));
+        }
+    }
+
+    public void updateUserPosition(String tagId) {
+        switch (tagId) {
+            case "040B62E26F3F81":
+                Constants.userPositionX = Constants.artifact1PosX;
+                Constants.userPositionY = Constants.artifact1PosY;
+                break;
+            case "047464E26F3F80":
+                Constants.userPositionX = Constants.artifact2PosX;
+                Constants.userPositionY = Constants.artifact2PosY;
+                break;
+            case "04725DE26F3F80":
+                Constants.userPositionX = Constants.artifact21PosX;
+                Constants.userPositionY = Constants.artifact21PosY;
+                break;
+            case "04BE63E26F3F80":
+                Constants.userPositionX = Constants.artifact22PosX;
+                Constants.userPositionY = Constants.artifact22PosY;
+                break;
+            case "047A64E26F3F80":
+                Constants.userPositionX = Constants.artifact41PosX;
+                Constants.userPositionY = Constants.artifact41PosY;
+                break;
+            case "047B65E26F3F80":
+                Constants.userPositionX = Constants.artifact42PosX;
+                Constants.userPositionY = Constants.artifact42PosY;
+                break;
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (session.checkLogin()) {
+            finish();
+        }
+
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             System.out.println("not supported");
@@ -100,7 +130,6 @@ public class DashboardActivity extends Activity {
         }
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
     }
-
 
     @Override
     protected void onPause() {
@@ -115,75 +144,10 @@ public class DashboardActivity extends Activity {
         }
     }
 
-    public void requestNewToken(UserSessionManager session, final String fn, final String ln, final String em) {
-        String URL = String.format(Constants.REQUEST_NEW_TOKEN, session.getUserDetails().get(UserSessionManager.KEY_REFRESH_TOKEN));
-        String userId = session.getUserDetails().get(UserSessionManager.KEY_USER_ID);
-
-        final RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                URL,
-                null,
-                (JSONObject response) -> {
-                    handleResponse(userId, response, fn, ln, em);
-                    pDialog.hide();
-                },
-                (VolleyError error) -> {
-                    error.printStackTrace();
-                    pDialog.hide();
-                }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                return VolleyUtils.getBasicAuthHeaders();
-            }
-        };
-        requestQueue.add(jsonObjectRequest);
-    }
-
-    private void handleResponse(String userId, JSONObject response, String fn, String ln, String em) {
-        String accessToken;
-        String refreshToken;
-        Long expiresIn;
-
-        try {
-            accessToken = response.get("access_token").toString();
-            refreshToken = response.get("refresh_token").toString();
-            expiresIn = Long.parseLong(response.get("expires_in").toString());
-
-            session.createUserLoginSession(userId, fn, ln, em, accessToken, refreshToken, expiresIn);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
-
-        Toast.makeText(getApplicationContext(), getText(R.string.token_refresh), Toast.LENGTH_LONG).show();
-    }
-
     @OnClick(R.id.galleriesId)
     public void goToGalleriesActivity() {
         Intent i = new Intent(getApplicationContext(), GalleriesActivity.class);
-        // i.putParcelableArrayListExtra("galleries", galleryList);
         startActivity(i);
-    }
-
-    public void renewBearerToken(UserSessionManager session) {
-        HashMap<String, String> user = session.getUserDetails();
-
-        String fn = user.get(UserSessionManager.KEY_FIRST_NAME);
-        String ln = user.get(UserSessionManager.KEY_LAST_NAME);
-        String em = user.get(UserSessionManager.KEY_EMAIL);
-
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-        requestNewToken(session, fn, ln, em);
     }
 
     @OnClick(R.id.btnLogout)
@@ -233,10 +197,6 @@ public class DashboardActivity extends Activity {
         requestQueue.add(request);
     }
 
-    private String getEncodedTagId(String tagId) {
-        return Base64.encodeToString(tagId.getBytes(), Base64.NO_WRAP);
-    }
-
     private void goToArtifactActivity(String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
         Intent i = new Intent(getApplicationContext(), ArtifactsActivity.class);
         i.putExtra("galleryId", galleryId);
@@ -258,5 +218,30 @@ public class DashboardActivity extends Activity {
     public void goToPoiActivity() {
         Intent intent = new Intent(getApplicationContext(), POIActivity.class);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.mapId)
+    public void goToMapActivity() {
+        Intent i = new Intent(getApplicationContext(), MapActivity.class);
+        startActivity(i);
+    }
+
+    public void loadLocale() {
+        String language = session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG);
+        if (language != null) {
+            changeLang(language);
+        }
+        System.out.println("AICI:" + language);
+    }
+
+    public void changeLang(String lang) {
+        if (lang.equalsIgnoreCase(""))
+            return;
+        Locale myLocale = new Locale(lang);
+        Locale.setDefault(myLocale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.locale = myLocale;
+        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+
     }
 }

@@ -92,8 +92,11 @@ public class ArtifactReviewActivity extends Activity {
     public void createReview() {
         float rating = ratingBar.getRating();
         String reviewText = editText.getText().toString();
+        String firstName = session.getUserDetails().get(UserSessionManager.KEY_FIRST_NAME);
+        String lastName = session.getUserDetails().get(UserSessionManager.KEY_LAST_NAME);
+        String fullName = firstName + " " + lastName;
 
-        Review artifactReview = new Review(rating, reviewText);
+        Review artifactReview = new Review(rating, reviewText, fullName);
         JSONObject galleryReviewJson = buildJsonObject(artifactReview);
         submitReview(galleryReviewJson);
     }
@@ -130,12 +133,13 @@ public class ArtifactReviewActivity extends Activity {
         requestQueue.add(request);
     }
 
-    private JSONObject buildJsonObject(Review galleryReview) {
+    private JSONObject buildJsonObject(Review artifactReview) {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("rating", galleryReview.getRating());
-            jsonObject.put("comment", galleryReview.getComment());
+            jsonObject.put("rating", artifactReview.getRating());
+            jsonObject.put("comment", artifactReview.getComment());
+            jsonObject.put("userFullName", artifactReview.getUserFullName());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -88,7 +88,7 @@ public class GalleriesActivity extends AppCompatActivity {
     private void prepareGalleries() {
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        String URL = Constants.GET_ALL_GALLERIES_URL + Locale.getDefault().getLanguage();
+        String URL = Constants.GET_ALL_GALLERIES_URL + session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG);
         System.out.println(Locale.getDefault().getLanguage());
 
         final Long requestTimestamp = System.currentTimeMillis();
@@ -144,6 +144,8 @@ public class GalleriesActivity extends AppCompatActivity {
                     case 3:
                         gallery.setImage(R.drawable.cheese_3);
                         break;
+                    default:
+                        gallery.setImage(R.drawable.cheese_2);
                 }
                 galleryList.add(gallery);
                 i++;

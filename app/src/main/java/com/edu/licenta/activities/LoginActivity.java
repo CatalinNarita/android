@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -147,8 +148,10 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println("USER LOGIN TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
 
                     LoginService loginService = new LoginService();
+                    String locale = session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG);
                     try {
-                        loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString(), response.get("id").toString());
+                        Log.d("User data:", response.toString());
+                        loginService.handleResponse(accessToken, refreshToken, expiresIn, getApplicationContext(), session, response.get("firstName").toString(), response.get("lastName").toString(), response.get("email").toString(), response.get("id").toString(), locale);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -48,16 +48,23 @@
             android:background="#fcfcfc"
             android:gravity="center"
             android:id="@+id/ll">
-            <Button
-                android:id="@+id/change_language_btn"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/change_language_label"/>
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/colorPrimary"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/change_language_button"
-                android:textColor="@color/white" />
+                android:orientation="vertical">
+                <RadioButton android:id="@+id/radio_english"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_en"/>
+                <RadioButton android:id="@+id/radio_romana"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_ro"/>
+            </RadioGroup>
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>

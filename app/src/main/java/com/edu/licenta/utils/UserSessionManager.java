@@ -28,6 +28,7 @@ public class UserSessionManager {
     public static final String KEY_ACCESS_TOKEN = "access_token";
     public static final String KEY_REFRESH_TOKEN = "refresh_token";
     private static final String KEY_ACCESS_TOKEN_EXPIRE_TIME = "expires_in";
+    public static final String KEY_CURRENT_LANG = "current_lang";
 
     public UserSessionManager(Context context){
         // Shared pref mode
@@ -49,7 +50,7 @@ public class UserSessionManager {
      * @param refreshToken the user's refresh token
      * @param expiresIn access token's remaining duration (in seconds)
      */
-    public void createUserLoginSession(String userId, String firstName, String lastName, String email, String accessToken, String refreshToken, Long expiresIn){
+    public void createUserLoginSession(String userId, String firstName, String lastName, String email, String accessToken, String refreshToken, Long expiresIn, String locale){
         editor.putBoolean(IS_USER_LOGGED_IN, true);
         editor.putString(KEY_USER_ID, userId);
         editor.putString(KEY_FIRST_NAME, firstName);
@@ -57,7 +58,14 @@ public class UserSessionManager {
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_ACCESS_TOKEN, accessToken);
         editor.putString(KEY_REFRESH_TOKEN, refreshToken);
+        editor.putString(KEY_CURRENT_LANG, locale);
         editor.putLong(KEY_ACCESS_TOKEN_EXPIRE_TIME, System.currentTimeMillis() / 1000L + expiresIn);
+
+        editor.commit();
+    }
+
+    public void changeLanguage(String locale) {
+        editor.putString(KEY_CURRENT_LANG, locale);
 
         editor.commit();
     }
@@ -101,6 +109,7 @@ public class UserSessionManager {
         user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
         user.put(KEY_ACCESS_TOKEN, pref.getString(KEY_ACCESS_TOKEN, null));
         user.put(KEY_REFRESH_TOKEN, pref.getString(KEY_REFRESH_TOKEN, null));
+        user.put(KEY_CURRENT_LANG, pref.getString(KEY_CURRENT_LANG, null));
 
         return user;
     }
@@ -111,7 +120,9 @@ public class UserSessionManager {
     public void logoutUser(){
 
         // Clearing all user data from Shared Preferences
+        String currentLanguage = pref.getString(KEY_CURRENT_LANG, null);
         editor.clear();
+        editor.putString(KEY_CURRENT_LANG, currentLanguage);
         editor.commit();
 
         // After logout redirect user to Login Activity

@@ -296,6 +296,14 @@ public class ArtifactDetailsActivity extends AppCompatActivity {
                 });
     }
 
+    @OnClick(R.id.btn_artifact_review_list)
+    public void goToReviewListActivity() {
+        Intent i = new Intent(getApplicationContext(), ArtifactReviewListActivity.class);
+        System.out.println(artifact.getId());
+        i.putExtra("artifactId", artifact.getId());
+        startActivity(i);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

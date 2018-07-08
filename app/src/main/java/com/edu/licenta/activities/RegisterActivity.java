@@ -178,7 +178,7 @@ public class RegisterActivity extends Activity {
                 (JSONObject response) -> {
                     System.out.println("USER AUTO LOGIN TIME: " + (System.currentTimeMillis() - requestTimestamp)/1000d + " seconds");
                     LoginService loginService = new LoginService();
-                    loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email, userId);
+                    loginService.handleResponse(response, getApplicationContext(), new UserSessionManager(getApplicationContext()), firstName, lastName, email, userId, "en");
                     pDialog.hide();
                 },
                 (VolleyError error) -> {

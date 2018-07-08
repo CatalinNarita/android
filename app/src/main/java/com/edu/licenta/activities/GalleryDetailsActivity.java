@@ -235,6 +235,14 @@ public class GalleryDetailsActivity extends AppCompatActivity {
                 });
     }
 
+    @OnClick(R.id.btn_gallery_review_list)
+    public void goToReviewListActivity() {
+        Intent i = new Intent(getApplicationContext(), GalleryReviewListActivity.class);
+        System.out.println(gallery.getId());
+        i.putExtra("galleryId", gallery.getId());
+        startActivity(i);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

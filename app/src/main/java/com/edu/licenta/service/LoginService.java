@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class LoginService {
 
-    public void handleResponse(JSONObject response, Context context, UserSessionManager session, String fn, String ln, String em, String userId) {
+    public void handleResponse(JSONObject response, Context context, UserSessionManager session, String fn, String ln, String em, String userId, String locale) {
         String accessToken;
         String refreshToken;
         Long expiresIn;
@@ -26,7 +26,7 @@ public class LoginService {
             refreshToken = response.get("refresh_token").toString();
             expiresIn = Long.parseLong(response.get("expires_in").toString());
 
-            session.createUserLoginSession(userId, fn, ln ,em, accessToken, refreshToken, expiresIn);
+            session.createUserLoginSession(userId, fn, ln ,em, accessToken, refreshToken, expiresIn, locale);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -41,9 +41,9 @@ public class LoginService {
         context.startActivity(i);
     }
 
-    public void handleResponse(String accessToken, String refreshToken, Long expiresIn, Context context, UserSessionManager session, String fn, String ln, String em, String userId) {
+    public void handleResponse(String accessToken, String refreshToken, Long expiresIn, Context context, UserSessionManager session, String fn, String ln, String em, String userId, String locale) {
 
-        session.createUserLoginSession(userId, fn, ln ,em, accessToken, refreshToken, expiresIn);
+        session.createUserLoginSession(userId, fn, ln ,em, accessToken, refreshToken, expiresIn, locale);
 
         Intent i = new Intent(context, DashboardActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

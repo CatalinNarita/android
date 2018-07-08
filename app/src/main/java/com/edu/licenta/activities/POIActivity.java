@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -18,6 +19,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,10 +59,9 @@ import butterknife.OnClick;
  */
 
 public class POIActivity extends AppCompatActivity implements RecognitionListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, AdapterView.OnItemSelectedListener, SeekBar.OnSeekBarChangeListener {
 
     SpeechRecognizer speechRecognizer;
-    @BindView(R.id.speech_result_text_view)
     TextView textView;
     GoogleMap googleMap;
     private GoogleApiClient client;
@@ -66,6 +71,9 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
     public static final int REQUEST_LOCATION_CODE = 99;
     int PROXIMITY_RADIUS = 10000;
     double latitude, longitude;
+    String searchQuery;
+
+    SeekBar seekBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +85,41 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        Spinner spinner = findViewById(R.id.poi_spinner);
+        spinner.setOnItemSelectedListener(this);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.poi_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        textView = findViewById(R.id.speech_result_text_view);
+
+        seekBar = findViewById(R.id.seek_bar_poi);
+        seekBar.setOnSeekBarChangeListener(this);
+        seekBar.setMax(50000);
+
         ButterKnife.bind(this);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            PROXIMITY_RADIUS = progress;
+            if (searchQuery.equals("club")) {
+                searchQuery = "night_club";
+            }
+            textView.setText(getString(R.string.range,String.valueOf(progress)));
+            searchAddresses(searchQuery);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
     @Override
@@ -159,7 +201,7 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
                 .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         matches.forEach(System.out::println);
 
-        textView.setText(matches.get(0));
+        /*textView.setText(matches.get(0));
 
 
         String searchQuery = matches.get(0);
@@ -185,7 +227,12 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
             e.printStackTrace();
         }
 
-        searchAddresses(searchQuery);
+        searchAddresses(searchQuery);*/
+
+        Uri gmmIntentUri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + matches.get(0));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 
     private void searchAddresses(String location) {
@@ -193,7 +240,9 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         Object dataTransfer[] = new Object[2];
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
 
-        googleMap.clear();
+        if (googleMap != null) {
+            googleMap.clear();
+        }
         String url = getUrl(latitude, longitude, location);
         dataTransfer[0] = googleMap;
         dataTransfer[1] = url;
@@ -296,7 +345,7 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
         googlePlaceUrl.append("&radius=" + PROXIMITY_RADIUS);
-        googlePlaceUrl.append("&type=" + nearbyPlace.toLowerCase());
+        googlePlaceUrl.append("&type=" + nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key=" + "AIzaSyBLEPBRfw7sMb73Mr88L91Jqh3tuE4mKsE");
 
@@ -348,4 +397,19 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         }
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        searchQuery = parent.getItemAtPosition(position).toString().toLowerCase();
+        searchQuery = searchQuery.substring(0, searchQuery.length() -1);
+        if (searchQuery.equals("club")) {
+            searchQuery = "night_club";
+        }
+        searchAddresses(searchQuery);
+        System.out.println(parent.getItemAtPosition(position));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

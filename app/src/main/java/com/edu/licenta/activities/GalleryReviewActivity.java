@@ -91,8 +91,11 @@ public class GalleryReviewActivity extends Activity {
     public void createReview() {
         float rating = ratingBar.getRating();
         String reviewText = editText.getText().toString();
+        String firstName = session.getUserDetails().get(UserSessionManager.KEY_FIRST_NAME);
+        String lastName = session.getUserDetails().get(UserSessionManager.KEY_LAST_NAME);
+        String fullName = firstName + " " + lastName;
 
-        Review galleryReview = new Review(rating, reviewText);
+        Review galleryReview = new Review(rating, reviewText, fullName);
         JSONObject galleryReviewJson = buildJsonObject(galleryReview);
         submitReview(galleryReviewJson);
     }
@@ -135,6 +138,7 @@ public class GalleryReviewActivity extends Activity {
         try {
             jsonObject.put("rating", galleryReview.getRating());
             jsonObject.put("comment", galleryReview.getComment());
+            jsonObject.put("userFullName", galleryReview.getUserFullName());
         } catch (Exception e) {
             e.printStackTrace();
         }
