@@ -49,4 +49,5 @@
     <string name="submit">Salveaza</string>
     <string name="submiting_review_title">Adaugare recenzie</string>
     <string name="no_artifact">Nu exista niciun artefact asociat acestui tag!</string>
+    <string name="search_poi">Cauta puncte de interes</string>
 </resources>

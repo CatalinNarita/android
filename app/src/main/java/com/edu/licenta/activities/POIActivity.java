@@ -74,6 +74,8 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
     String searchQuery;
 
     SeekBar seekBar;
+    LocationManager locationManager;
+    Location location;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,6 +93,9 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
+
         textView = findViewById(R.id.speech_result_text_view);
 
         seekBar = findViewById(R.id.seek_bar_poi);
@@ -104,11 +109,7 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
             PROXIMITY_RADIUS = progress;
-            if (searchQuery.equals("club")) {
-                searchQuery = "night_club";
-            }
             textView.setText(getString(R.string.range,String.valueOf(progress)));
-            searchAddresses(searchQuery);
         }
     }
 
@@ -199,35 +200,6 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         ArrayList<String> matches = results
 
                 .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        matches.forEach(System.out::println);
-
-        /*textView.setText(matches.get(0));
-
-
-        String searchQuery = matches.get(0);
-
-        List<Address> addressList;
-        Geocoder geocoder = new Geocoder(this);
-
-        try {
-            addressList = geocoder.getFromLocationName(searchQuery, 5);
-
-            if (addressList != null) {
-                for (int i = 0; i < addressList.size(); i++) {
-                    LatLng latLng = new LatLng(addressList.get(i).getLatitude(), addressList.get(i).getLongitude());
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title(searchQuery);
-                    googleMap.addMarker(markerOptions);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        searchAddresses(searchQuery);*/
 
         Uri gmmIntentUri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + matches.get(0));
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -248,6 +220,16 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         dataTransfer[1] = url;
 
         getNearbyPlacesData.execute(dataTransfer);
+
+        CameraPosition position = CameraPosition.builder()
+                .target(new LatLng(latitude, longitude))
+                .zoom(16)
+                .bearing(0)
+                .tilt(45)
+                .build();
+
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+
     }
 
     @Override
@@ -287,8 +269,6 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
 
         this.googleMap = googleMap;
 
-        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        Location location;
         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         CameraPosition position = CameraPosition.builder()
@@ -404,12 +384,15 @@ public class POIActivity extends AppCompatActivity implements RecognitionListene
         if (searchQuery.equals("club")) {
             searchQuery = "night_club";
         }
-        searchAddresses(searchQuery);
-        System.out.println(parent.getItemAtPosition(position));
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @OnClick(R.id.search_poi)
+    public void searchPOI() {
+        searchAddresses(searchQuery);
     }
 }

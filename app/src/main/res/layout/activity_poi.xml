@@ -1,91 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.edu.licenta.activities.SettingsActivity"
-    android:background="#fcfcfc">
+    android:background="#fcfcfc"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+    <Button
+        android:id="@+id/record_sound_btn"
         android:layout_width="match_parent"
-        android:layout_height="300dp">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/colorPrimary"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/record_sound"
+        android:textColor="@color/white" />
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="exitUntilCollapsed|scroll"
-            app:contentScrim="?attr/colorPrimary"
-            app:title="Guide me"
-            app:expandedTitleMarginStart="48dp"
-            app:expandedTitleMarginEnd="64dp"
-            android:background="@drawable/img">
+    <Spinner
+        android:id="@+id/poi_spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp" />
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_collapseMode="pin"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"/>
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView
+    <SeekBar
+        android:id="@+id/seek_bar_poi"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:background="#fcfcfc"
-            android:gravity="center"
-            android:id="@+id/ll">
-            <Button
-                android:id="@+id/record_sound_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/colorPrimary"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/record_sound"
-                android:textColor="@color/white" />
-            <Spinner
-                android:id="@+id/poi_spinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"/>
-            <SeekBar
-                android:id="@+id/seek_bar_poi"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            <TextView android:id="@+id/speech_result_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </LinearLayout>
+    <TextView
+        android:id="@+id/speech_result_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-
-    </android.support.v4.widget.NestedScrollView>
+    <Button
+        android:id="@+id/search_poi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/colorPrimary"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/search_poi"
+        android:textColor="@color/white"/>
 
     <fragment
-        android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_height="280dp"
+        android:name="com.google.android.gms.maps.MapFragment"
         map:uiCompass="true"
-        />
-
-</android.support.design.widget.CoordinatorLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+</LinearLayout>
 

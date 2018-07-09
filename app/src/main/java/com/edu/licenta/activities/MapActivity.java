@@ -29,7 +29,7 @@ public class MapActivity extends Activity implements SensorEventListener {
     float angle;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)  throws SecurityException{
+    public void onCreate(Bundle savedInstanceState) throws SecurityException {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 

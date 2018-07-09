@@ -92,5 +92,6 @@
         <item>Hospitals</item>
     </string-array>
     <string name="no_artifact">There is no artifact associated with this tag!</string>
+    <string name="search_poi">Search points of interest</string>
 
 </resources>
