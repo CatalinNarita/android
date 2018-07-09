@@ -7,7 +7,7 @@
     android:weightSum="20"
     android:background="#DDDDDD">
     <TextView
-        android:text="Artifacts"
+        android:text="@string/artifacts_title"
         android:textSize="30dp"
         android:background="#111111"
         android:textColor="#EEEEEE"

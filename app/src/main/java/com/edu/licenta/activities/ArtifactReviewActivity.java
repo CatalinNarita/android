@@ -88,6 +88,11 @@ public class ArtifactReviewActivity extends Activity {
         finish();
     }
 
+    @OnClick(R.id.btn_cancel_rating_artifact)
+    public void exitActivityFromButton() {
+        finish();
+    }
+
     @OnClick(R.id.btn_submit_rating_artifact)
     public void createReview() {
         float rating = ratingBar.getRating();

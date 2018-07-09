@@ -239,6 +239,9 @@ public class DashboardActivity extends Activity {
         String language = session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG);
         if (language != null) {
             changeLang(language);
+        } else {
+            session.changeLanguage("en");
+            changeLang("en");
         }
         System.out.println("AICI:" + language);
     }

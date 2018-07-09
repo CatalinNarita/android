@@ -68,7 +68,7 @@ public class GalleryReviewListActivity extends Activity {
 
         String URL = String.format(Constants.GET_ALL_GALLERY_REVIEWS_URL, galleryId);
 ;
-        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.loading_galleries), getString(R.string.please_wait), this);
+        pDialog = VolleyUtils.buildProgressDialog(getString(R.string.loading_reviews), getString(R.string.please_wait), this);
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,

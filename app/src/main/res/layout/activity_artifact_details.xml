@@ -109,9 +109,14 @@
 
             <Button
                 android:id="@+id/btn_artifact_review_list"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Review list"/>
+                android:background="@color/colorPrimary"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/review_list"
+                android:textColor="@color/white"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"/>
 
         </LinearLayout>
 

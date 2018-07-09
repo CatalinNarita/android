@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Museum guide</string>
+    <string name="app_name">GuideMe</string>
     <string name="action_settings" translatable="false">Settings</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -93,5 +93,11 @@
     </string-array>
     <string name="no_artifact">There is no artifact associated with this tag!</string>
     <string name="search_poi">Search points of interest</string>
+    <string name="review_list">Review list</string>
+    <string name="loading_reviews">Loading reviews...</string>
+    <string name="rating_label">Rating:</string>
+    <string name="comment_label">Comment:</string>
+    <string name="artifacts_title">Artifacts</string>
+    <string name="galleries_title">Galleries</string>
 
 </resources>

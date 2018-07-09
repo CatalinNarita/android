@@ -87,6 +87,11 @@ public class GalleryReviewActivity extends Activity {
         finish();
     }
 
+    @OnClick(R.id.btn_cancel_rating_gallery)
+    public void exitActivityFromButton() {
+        finish();
+    }
+
     @OnClick(R.id.btn_submit_rating_gallery)
     public void createReview() {
         float rating = ratingBar.getRating();

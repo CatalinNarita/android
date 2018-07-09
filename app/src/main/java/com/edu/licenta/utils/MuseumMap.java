@@ -95,6 +95,7 @@ public class MuseumMap extends ViewGroup {
         canvas.drawBitmap(pointer1, 880, 1460, pointerPaint);
 
         canvas.translate(getWidth() / 2, getHeight() / 2 + 700);
+        canvas.rotate(-90);
 
         Matrix matrix = mMatrix;
         matrix.reset();
@@ -104,7 +105,7 @@ public class MuseumMap extends ViewGroup {
         matrix.postTranslate(posX, posY);
 
         matrix.postTranslate(-posX, -posY);
-        matrix.postRotate((float) Math.toDegrees(angle) - 90);
+        matrix.postRotate((float) Math.toDegrees(angle));
         matrix.postTranslate(posX, posY);
 
         canvas.drawBitmap(pointer, matrix, pointerPaint);

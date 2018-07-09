@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Museum guide</string>
+    <string name="app_name">GuideMe</string>
     <string name="write_review">Scrie o parere</string>
     <string name="position">Unde ma aflu?</string>
     <string name="username">Nume utilizator</string>
@@ -50,4 +50,10 @@
     <string name="submiting_review_title">Adaugare recenzie</string>
     <string name="no_artifact">Nu exista niciun artefact asociat acestui tag!</string>
     <string name="search_poi">Cauta puncte de interes</string>
+    <string name="review_list">Lista review-uri</string>
+    <string name="loading_reviews">Se incarca review-urile...</string>
+    <string name="rating_label">Nota:</string>
+    <string name="comment_label">Comentariu:</string>
+    <string name="artifacts_title">Artefacte</string>
+    <string name="galleries_title">Galerii</string>
 </resources>

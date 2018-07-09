@@ -16,7 +16,7 @@
         android:transitionName="avatar"/>
 
     <TextView
-        android:textColor="#00DDDD"
+        android:textColor="#000000"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
