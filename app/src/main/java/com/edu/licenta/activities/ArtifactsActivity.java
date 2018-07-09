@@ -208,15 +208,45 @@ public class ArtifactsActivity extends AppCompatActivity {
             try {
                 Artifact artifact = new Artifact(Long.parseLong(o.get("id").toString()), o.get("name").toString(), o.get("textBasic").toString(), o.get("textAdvanced").toString(), o.get("tagId").toString());
 
-                switch (i) {
+                switch (Math.toIntExact(artifact.getId())) {
                     case 1:
-                        artifact.setImage(R.drawable.cheese_1);
+                        artifact.setImage(R.drawable.electron);
                         break;
                     case 2:
-                        artifact.setImage(R.drawable.cheese_2);
+                        artifact.setImage(R.drawable.electron);
                         break;
                     case 3:
-                        artifact.setImage(R.drawable.cheese_3);
+                        artifact.setImage(R.drawable.electricity);
+                        break;
+                    case 4:
+                        artifact.setImage(R.drawable.electricity);
+                        break;
+                    case 5:
+                        artifact.setImage(R.drawable.huaihai);
+                        break;
+                    case 6:
+                        artifact.setImage(R.drawable.huaihai);
+                        break;
+                    case 7:
+                        artifact.setImage(R.drawable.schism);
+                        break;
+                    case 8:
+                        artifact.setImage(R.drawable.schism);
+                        break;
+                    case 9:
+                        artifact.setImage(R.drawable.halong);
+                        break;
+                    case 10:
+                        artifact.setImage(R.drawable.halong);
+                        break;
+                    case 11:
+                        artifact.setImage(R.drawable.falls);
+                        break;
+                    case 12:
+                        artifact.setImage(R.drawable.falls);
+                        break;
+                    default:
+                        artifact.setImage(R.drawable.electricity);
                         break;
                 }
 

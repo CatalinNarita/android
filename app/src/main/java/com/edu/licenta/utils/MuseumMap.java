@@ -23,7 +23,7 @@ import java.util.Date;
  * on 03-Jul-18.
  */
 
-public class BubbleLevelCompass extends ViewGroup {
+public class MuseumMap extends ViewGroup {
 
     private Paint mainPaint;
     private Paint pointerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -31,15 +31,15 @@ public class BubbleLevelCompass extends ViewGroup {
     private Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Bitmap pointer;
+    private Bitmap pointer1;
 
     float posX = 0;
     float posY = 0;
     float angle;
-    boolean finishedDrawing = false;
 
     Matrix mMatrix;
 
-    public BubbleLevelCompass(Context context, AttributeSet attrs) {
+    public MuseumMap(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(false);
         requestFocus();
@@ -55,6 +55,7 @@ public class BubbleLevelCompass extends ViewGroup {
         borderPaint.setStrokeWidth(30);
         borderPaint.setColor(ContextCompat.getColor(context, R.color.saddleBrown));
         pointer = BitmapFactory.decodeResource(getResources(), R.drawable.pointer_resized);
+        pointer1 = BitmapFactory.decodeResource(getResources(), R.drawable.pointer2);
         mMatrix = new Matrix();
     }
 
@@ -62,9 +63,7 @@ public class BubbleLevelCompass extends ViewGroup {
         this.posX = posX;
         this.posY = posY;
         this.angle = angle;
-        if (finishedDrawing) {
-            invalidate();
-        }
+        invalidate();
     }
 
     @Override
@@ -73,13 +72,6 @@ public class BubbleLevelCompass extends ViewGroup {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        finishedDrawing = false;
-        /*canvas.drawCircle(getPosX() , getPosY(), pointerRadius, pointerPaint);
-        canvas.drawText(String.format("%.1f",getAccX()), 270.0f,200.0f, textPaint);
-        canvas.drawText(String.format("%.1f",getAccY()), 270.0f,250.0f, textPaint);
-        canvas.drawText(String.format("%.1f",getAccZ()), 270.0f,300.0f, textPaint);*/
-        canvas.drawText(String.valueOf(angle), 270.0f, 350.0f, textPaint);
-
         canvas.drawLine(0, 0, 1080, 0, borderPaint);
         canvas.drawLine(1080, 0, 1080, 1760, borderPaint);
         canvas.drawLine(0, 1760, 1080, 1760, borderPaint);
@@ -93,13 +85,22 @@ public class BubbleLevelCompass extends ViewGroup {
         canvas.drawLine(285, 1230, 795, 1230, linePaint);
         canvas.drawLine(870, 1230, 1080, 1230, linePaint);
 
-        canvas.translate(getWidth() / 2, getHeight() / 2);
-        canvas.rotate(-90);
+        canvas.drawBitmap(pointer1, 200, 200, pointerPaint);
+        canvas.drawBitmap(pointer1, 880, 200, pointerPaint);
+
+        canvas.drawBitmap(pointer1, 200, 800, pointerPaint);
+        canvas.drawBitmap(pointer1, 880, 800, pointerPaint);
+
+        canvas.drawBitmap(pointer1, 200, 1460, pointerPaint);
+        canvas.drawBitmap(pointer1, 880, 1460, pointerPaint);
+
+        canvas.translate(getWidth() / 2, getHeight() / 2 + 700);
+        //canvas.rotate(-90);
 
         Matrix matrix = mMatrix;
         matrix.reset();
 
-        matrix.postTranslate(-pointer.getWidth() / 2, -pointer.getHeight() /2);
+        matrix.postTranslate(-pointer.getWidth() / 2, -pointer.getHeight() / 2);
 
         matrix.postTranslate(posX, posY);
 
@@ -107,8 +108,7 @@ public class BubbleLevelCompass extends ViewGroup {
         matrix.postRotate((float) Math.toDegrees(angle));
         matrix.postTranslate(posX, posY);
 
-        canvas.drawBitmap(pointer, matrix ,pointerPaint);
-        finishedDrawing = true;
+        canvas.drawBitmap(pointer, matrix, pointerPaint);
     }
 
     @Override

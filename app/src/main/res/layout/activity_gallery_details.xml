@@ -74,8 +74,7 @@
                     <TextView
                         android:id="@+id/gallery_description_gallery_details"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/cheese_ipsum" />
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 

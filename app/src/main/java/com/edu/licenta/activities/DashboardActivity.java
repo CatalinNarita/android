@@ -77,6 +77,9 @@ public class DashboardActivity extends Activity {
             byte[] tagIdBytes = tag.getId();
             String hexaTagId = binaryToHexa(tagIdBytes);
 
+            System.out.println(tagIdBytes);
+            System.out.println(hexaTagId);
+
             addDiscoveredArtifact(hexaTagId, session.getUserDetails().get(UserSessionManager.KEY_USER_ID));
 
             updateUserPosition(hexaTagId);
@@ -88,28 +91,28 @@ public class DashboardActivity extends Activity {
     public void updateUserPosition(String tagId) {
         switch (tagId) {
             case "040B62E26F3F81":
-                Constants.userPositionX = Constants.artifact1PosX;
-                Constants.userPositionY = Constants.artifact1PosY;
+                Constants.userPositionX = Constants.artifact1PosX - 540;
+                Constants.userPositionY = Constants.artifact1PosY - 1580;
                 break;
             case "047464E26F3F80":
-                Constants.userPositionX = Constants.artifact2PosX;
-                Constants.userPositionY = Constants.artifact2PosY;
+                Constants.userPositionX = Constants.artifact2PosX - 540;
+                Constants.userPositionY = Constants.artifact2PosY - 1580;
                 break;
             case "04725DE26F3F80":
-                Constants.userPositionX = Constants.artifact21PosX;
-                Constants.userPositionY = Constants.artifact21PosY;
+                Constants.userPositionX = Constants.artifact21PosX - 540;
+                Constants.userPositionY = Constants.artifact21PosY - 1580;
                 break;
             case "04BE63E26F3F80":
-                Constants.userPositionX = Constants.artifact22PosX;
-                Constants.userPositionY = Constants.artifact22PosY;
+                Constants.userPositionX = Constants.artifact22PosX - 540;
+                Constants.userPositionY = Constants.artifact22PosY - 1580;
                 break;
             case "047A64E26F3F80":
-                Constants.userPositionX = Constants.artifact41PosX;
-                Constants.userPositionY = Constants.artifact41PosY;
+                Constants.userPositionX = Constants.artifact41PosX - 540;
+                Constants.userPositionY = Constants.artifact41PosY - 1580;
                 break;
             case "047B65E26F3F80":
-                Constants.userPositionX = Constants.artifact42PosX;
-                Constants.userPositionY = Constants.artifact42PosY;
+                Constants.userPositionX = Constants.artifact42PosX - 540;
+                Constants.userPositionY = Constants.artifact42PosY - 1580;
                 break;
         }
     }
@@ -173,13 +176,19 @@ public class DashboardActivity extends Activity {
                     System.out.println("ADD NEW DISCOVERED ARTIFACT: " + (System.currentTimeMillis() - requestTimestamp) / 1000d + " seconds");
                     String galleryId = null;
                     try {
-                        galleryId = locale.equals("en") ? String.valueOf((Integer)response.get(0)) : String.valueOf((Integer)response.get(1));
+                        galleryId = locale.equals("en") ? String.valueOf((Integer) response.get(0)) : String.valueOf((Integer) response.get(1));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    goToArtifactActivity(galleryId, ArtifactsFetchInitiatorEnum.NFC);
-                    System.out.println("AICI: " + response);
-                    pDialog.hide();
+
+                    if (galleryId.equals("-1")) {
+                        pDialog.hide();
+                        VolleyUtils.buildAlertDialog(getString(R.string.error_title), getString(R.string.no_artifact), this);
+                    } else {
+                        goToArtifactActivity(galleryId, ArtifactsFetchInitiatorEnum.NFC);
+                        System.out.println("AICI: " + response);
+                        pDialog.hide();
+                    }
                 },
                 VolleyError::printStackTrace
         ) {
@@ -241,7 +250,7 @@ public class DashboardActivity extends Activity {
         Locale.setDefault(myLocale);
         android.content.res.Configuration config = new android.content.res.Configuration();
         config.locale = myLocale;
-        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
 
     }
 }

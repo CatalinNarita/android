@@ -53,23 +53,23 @@ public class Constants {
     public static float lastY = 0;
 
     //artifacts positions
-    public static float artifact1PosX = 90;
-    public static float artifact1PosY = 1630;
+    public static float artifact1PosX = 200;
+    public static float artifact1PosY = 1500;
 
-    public static float artifact2PosX = 900;
-    public static float artifact2PosY = 1630;
+    public static float artifact2PosX = 880;
+    public static float artifact2PosY = 1500;
 
-    public static float artifact21PosX = 90;
-    public static float artifact21PosY = 880;
+    public static float artifact21PosX = 200;
+    public static float artifact21PosY = 840;
 
-    public static float artifact22PosX = 900;
-    public static float artifact22PosY = 880;
+    public static float artifact22PosX = 880;
+    public static float artifact22PosY = 840;
 
-    public static float artifact41PosX = 90;
-    public static float artifact41PosY = 130;
+    public static float artifact41PosX = 200;
+    public static float artifact41PosY =240;
 
-    public static float artifact42PosX = 900;
-    public static float artifact42PosY = 130;
+    public static float artifact42PosX = 880;
+    public static float artifact42PosY = 240;
 
     //user position
     public static float userPositionX = 0;
