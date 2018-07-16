@@ -91,8 +91,8 @@ public class GalleryReviewListActivity extends Activity {
         };
 
         jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(
-                (int) TimeUnit.SECONDS.toMillis(100),//time out in 10second
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//DEFAULT_MAX_RETRIES = 1;
+                (int) TimeUnit.SECONDS.toMillis(100),
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(jsonArrayRequest);
