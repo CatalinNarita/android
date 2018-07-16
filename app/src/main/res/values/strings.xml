@@ -79,7 +79,7 @@
 
     <string name="value_format">%1$.2f</string>
     <string name="language_en">English</string>
-    <string name="language_ro">Română</string>
+    <string name="language_ro">Deutsch</string>
     <string name="change_language_label">Change language</string>
     <string name="range">Range: %1$s</string>
 

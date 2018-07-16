@@ -24,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.delta.activities.R;
 import com.edu.licenta.model.Gallery;
 import com.edu.licenta.utils.Constants;
+import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -64,6 +65,8 @@ public class GalleryDetailsActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     Gallery gallery;
+
+    UserSessionManager session;
 
     File temp = null;
     String galleryDescription;
@@ -119,6 +122,9 @@ public class GalleryDetailsActivity extends AppCompatActivity {
 
             }
         });
+
+        session = new UserSessionManager(getApplicationContext());
+
         getEncodedAudio(galleryDescription);
     }
 
@@ -127,7 +133,7 @@ public class GalleryDetailsActivity extends AppCompatActivity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        JSONObject body = VolleyUtils.buildGTTSRequestBody(galleryDescription);
+        JSONObject body = VolleyUtils.buildGTTSRequestBody(galleryDescription, session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG));
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,

@@ -26,6 +26,7 @@ import com.delta.activities.R;
 import com.edu.licenta.model.Artifact;
 import com.edu.licenta.model.Gallery;
 import com.edu.licenta.utils.Constants;
+import com.edu.licenta.utils.UserSessionManager;
 import com.edu.licenta.utils.VolleyUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -74,6 +75,7 @@ public class ArtifactDetailsActivity extends AppCompatActivity {
     FileInputStream fisAdvanced;
     Handler mSeekBarUpdateHandler = new Handler();
     Artifact artifact;
+    UserSessionManager session;
     Runnable mUpdateSeekBar = new Runnable() {
         @Override
         public void run() {
@@ -104,6 +106,7 @@ public class ArtifactDetailsActivity extends AppCompatActivity {
 
         gTextViews.get(0).setText(artifactName);
         gTextViews.get(1).setText(textBasic);
+        session = new UserSessionManager(getApplicationContext());
 
         mp.setOnCompletionListener((MediaPlayer mp) -> {
             playButton.setImageResource(android.R.drawable.ic_media_play);
@@ -135,8 +138,8 @@ public class ArtifactDetailsActivity extends AppCompatActivity {
 
         final RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        JSONObject bodyBasic = VolleyUtils.buildGTTSRequestBody(textBasic);
-        JSONObject bodyAdvanced = VolleyUtils.buildGTTSRequestBody(textAdvanced);
+        JSONObject bodyBasic = VolleyUtils.buildGTTSRequestBody(textBasic, session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG));
+        JSONObject bodyAdvanced = VolleyUtils.buildGTTSRequestBody(textAdvanced, session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG));
 
         JsonObjectRequest requestBasic = new JsonObjectRequest(
                 Request.Method.POST,

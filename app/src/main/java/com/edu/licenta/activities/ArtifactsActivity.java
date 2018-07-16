@@ -96,7 +96,7 @@ public class ArtifactsActivity extends AppCompatActivity {
     }
 
     public void getUserDiscoveredArtifacts(String userId, String galleryId, ArtifactsFetchInitiatorEnum artifactsFetchSource) {
-        String locale = Locale.getDefault().getLanguage();
+        String locale = session.getUserDetails().get(UserSessionManager.KEY_CURRENT_LANG);
         String URL = String.format(Constants.GET_USER_DISCOVERED_ARTIFACTS, userId, galleryId, locale);
         pDialog = VolleyUtils.buildProgressDialog(getString(R.string.loading_artifacts), getString(R.string.please_wait), this);
 

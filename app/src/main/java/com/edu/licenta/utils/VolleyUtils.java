@@ -110,6 +110,52 @@ public class VolleyUtils {
         return body;
     }
 
+    public static JSONObject buildGTTSRequestBody(String galleryDescription, String locale){
+
+        String rawJSON;
+
+        if (locale.equals("en")) {
+
+            rawJSON = "{\n" +
+                    "    \"input\":{\n" +
+                    "    \t\"text\":\"" + galleryDescription + "\"\n" +
+                    "     },\n" +
+                    "    \"voice\":{\n" +
+                    "    \t\"languageCode\":\"en-en\",\n" +
+                    "    \t\"name\":\"en-GB-Standard-A\",\n" +
+                    "    \t\"ssmlGender\":\"FEMALE\"\n" +
+                    "    },\n" +
+                    "    \"audioConfig\":{\n" +
+                    "    \t\"audioEncoding\":\"MP3\"\n" +
+                    "    }\n" +
+                    "}";
+        } else {
+            rawJSON = "{\n" +
+                    "    \"input\":{\n" +
+                    "    \t\"text\":\"" + galleryDescription + "\"\n" +
+                    "     },\n" +
+                    "    \"voice\":{\n" +
+                    "    \t\"languageCode\":\"de-de\",\n" +
+                    "    \t\"name\":\"de-DE-Standard-A\",\n" +
+                    "    \t\"ssmlGender\":\"FEMALE\"\n" +
+                    "    },\n" +
+                    "    \"audioConfig\":{\n" +
+                    "    \t\"audioEncoding\":\"MP3\"\n" +
+                    "    }\n" +
+                    "}";
+        }
+
+        JSONObject body = null;
+
+        try{
+            body = new JSONObject(rawJSON);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return body;
+    }
+
     public static boolean checkIfConnAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
